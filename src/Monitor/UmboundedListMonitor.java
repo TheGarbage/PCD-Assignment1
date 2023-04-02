@@ -28,7 +28,6 @@ public class UmboundedListMonitor {
 
     public synchronized void reset(){
         list.clear();
-        counter.reset();
+        list.add("Pass");
     }
-
 }

@@ -12,7 +12,7 @@ public class Main2 {
         threadMaster.initialializzation("G:\\Università\\Non_Date\\Programmazione concorrente\\Prova 1\\TestFolder2", 5, 50, 10);
         Thread.sleep(100);
         state.changeState(StateMonitor.StateEnum.START);
-        Thread.sleep(50);
+        Thread.sleep(1000);
         threadMaster.initialializzation("G:\\Università\\Non_Date\\Programmazione concorrente\\Prova 1\\TestFolder2", 2, 20, 2);
         Thread.sleep(5000);
         state.changeState(StateMonitor.StateEnum.OFF);

@@ -86,12 +86,14 @@ public class ThreadMaster extends AbstractThread{
                                 }
                                 default -> {
                                     filesToReadList.reset();
-                                    for(Thread t : threadArray)
-                                        filesToReadList.put(commitSuicideMessage);
-                                    for(Thread t : threadArray)
-                                        t.join();
-                                    filesToReadList.reset();
-                                    start = true;
+                                    state.readState();
+
+//                                    for(Thread t : threadArray)
+//                                        filesToReadList.put(commitSuicideMessage);
+//                                    for(Thread t : threadArray)
+//                                        t.join();
+//                                    filesToReadList.reset();
+//                                    start = true;
                                 }
                             }
                         }
