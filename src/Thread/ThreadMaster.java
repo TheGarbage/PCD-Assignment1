@@ -52,9 +52,7 @@ public class ThreadMaster extends AbstractThread{
                                 t.inizializza();
                             filesToReadList.put(d);
                             switch (state.readState()) {
-                                case CONTINUE -> {
-                                    stampa(time);
-                                }
+                                case CONTINUE -> stampa(time);
                                 case OFF -> {
                                     for (Thread t : threadArray)
                                         filesToReadList.put(commitSuicideMessage);
@@ -84,7 +82,7 @@ public class ThreadMaster extends AbstractThread{
         String prova;
         for (int i = n - 1; i >= 0; i--) {
             prova = sizeClassificationList.read(i);
-            System.out.println(String.valueOf(n - i) + ")" +
+            System.out.println((n - i) + ")" +
                     " " + prova.subSequence(maxCaracters + 1, prova.length())
                     + " - " + prova.subSequence(
                     58 - (int) prova.charAt(maxCaracters), maxCaracters)

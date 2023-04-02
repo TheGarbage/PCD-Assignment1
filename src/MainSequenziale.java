@@ -56,7 +56,7 @@ public class MainSequenziale {
         recursive(new File(d), "");
         //Controllare che la lista non sia vuota
         for(int i = list.size() - 1; i >= list.size() - n; i--)
-            System.out.println(String.valueOf(list.size() - i) + ")" +
+            System.out.println(list.size() - i + ")" +
                     " " + list.get(i).subSequence(max + 1, list.get(i).length())
                     + " - " + list.get(i).subSequence(
                     58 - (int) list.get(i).charAt(max), max)
