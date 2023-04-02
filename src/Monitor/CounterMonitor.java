@@ -15,8 +15,4 @@ public class CounterMonitor {
     public synchronized long read(){ //Saranno letti da solo un thread
         return count;
     }
-
-    public synchronized void reset(){
-        count = 0;
-    }
 }

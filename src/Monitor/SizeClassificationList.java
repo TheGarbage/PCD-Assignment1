@@ -2,12 +2,11 @@ package Monitor;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class BoundedListMonitor {
+public class SizeClassificationList {
     final ArrayList<String> list = new ArrayList<>();
-    int nReader = 0;
     final int maxSize;
 
-    public BoundedListMonitor(int maxSize){
+    public SizeClassificationList(int maxSize){
         this.maxSize = maxSize;
     }
 
@@ -26,20 +25,12 @@ public class BoundedListMonitor {
         }
         else{
             this.list.add(item);
+            notify();
         }
     }
 
-    public String read(int i) throws InterruptedException { //Potrebbe scatenare un'eccezione se è vuoto
-        synchronized (this){
-            nReader++;
-        }
-        String item = this.list.get(i);
-        synchronized (this){
-            nReader--;
-            if(nReader == 0)
-                this.notify();
-        }
-        return item;
+    public synchronized String read(int i) throws InterruptedException {
+        while (list.isEmpty()) wait();
+        return this.list.get(i);
     }
-
 }

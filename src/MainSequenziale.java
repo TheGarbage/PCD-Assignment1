@@ -5,7 +5,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class Main {
+public class MainSequenziale {
 
     static String d = "G:\\Università\\Non_Date\\Programmazione concorrente\\Prova 1\\TestFolder2";
     static int ni = 5;

@@ -1,18 +1,21 @@
 package Monitor;
 import java.util.ArrayList;
 
-public class UmboundedListMonitor {
+public class FilesToReadList {
     final ArrayList<String> list = new ArrayList<>();
     CounterMonitor counter = new CounterMonitor();
     final StateMonitor stateMainThread;
+    private boolean active = true;
 
-    public UmboundedListMonitor(StateMonitor stateMainThread){
+    public FilesToReadList(StateMonitor stateMainThread){
         this.stateMainThread = stateMainThread;
     }
 
     public synchronized void put(String item) throws InterruptedException {
+        if(active) {
             this.list.add(item);
             this.notify();
+        }
     }
 
     public synchronized String get() throws InterruptedException {
@@ -28,6 +31,11 @@ public class UmboundedListMonitor {
 
     public synchronized void reset(){
         list.clear();
-        list.add("Pass");
+        list.add("Pass"); // Cosi ho la certezza che almeno uno attivo ci sarà
+        active = false;
+    }
+
+    public synchronized void activate(){
+        active = true;
     }
 }

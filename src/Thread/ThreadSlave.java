@@ -35,7 +35,7 @@ public class ThreadSlave extends AbstractThread {
             try {
                 path = this.filesToReadList.get();
                 if (path.equals(commitSuicideMessage)) break;
-                if(!path.equals("Pass")) {
+                else if(!path.equals("Pass")) {
                     if (path.endsWith(".java")) {
                         BufferedReader reader = new BufferedReader(new FileReader(path));
                         lines = 0;
@@ -47,13 +47,12 @@ public class ThreadSlave extends AbstractThread {
                             this.counterList[(int) lines / (this.maxl / (this.ni - 1))].increment();
                         else
                             this.counterList[this.ni - 1].increment();
-                    } else {
+                    }
+                    else {
                         file = new File(path);
-                        for (File f : file.listFiles()) {
-                            if (f.getName().endsWith(".java") || f.listFiles() != null) {
+                        for (File f : file.listFiles())
+                            if (f.getName().endsWith(".java") || f.listFiles() != null)
                                 this.filesToReadList.put(f.getPath());
-                            }
-                        }
                     }
                 }
                 this.filesToReadList.decrementActiveMonitorCounter();

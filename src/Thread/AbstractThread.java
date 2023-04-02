@@ -1,12 +1,12 @@
 package Thread;
 
 import Monitor.CounterMonitor;
-import Monitor.BoundedListMonitor;
-import Monitor.UmboundedListMonitor;
+import Monitor.SizeClassificationList;
+import Monitor.FilesToReadList;
 
 public abstract class AbstractThread extends Thread{
-    protected UmboundedListMonitor filesToReadList;
-    protected BoundedListMonitor sizeClassificationList;
+    protected FilesToReadList filesToReadList;
+    protected SizeClassificationList sizeClassificationList;
     protected CounterMonitor[] counterList;
 
     protected int n;

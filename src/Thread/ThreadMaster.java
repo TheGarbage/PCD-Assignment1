@@ -1,9 +1,9 @@
 package Thread;
 
 import Monitor.CounterMonitor;
-import Monitor.BoundedListMonitor;
+import Monitor.SizeClassificationList;
 import Monitor.StateMonitor;
-import Monitor.UmboundedListMonitor;
+import Monitor.FilesToReadList;
 
 import java.io.File;
 
@@ -12,18 +12,20 @@ public class ThreadMaster extends AbstractThread{
     private String d;
     private final ThreadSlave[] threadArray;
     final private StateMonitor state;
-    Boolean start = true;
 
 
     public ThreadMaster(StateMonitor state){
         super();
         this.threadArray = new ThreadSlave[Runtime.getRuntime().availableProcessors()];
-        this.filesToReadList = new UmboundedListMonitor(state);
+        this.filesToReadList = new FilesToReadList(state);
+        for(int i = 0; i < threadArray.length; i++)
+            (threadArray[i] = new ThreadSlave(this)).start();
         this.state = state;
+        this.start();
     }
 
     public void initialializzation(String d, int n, int maxl, int ni){
-        this.sizeClassificationList = new BoundedListMonitor(n);
+        this.sizeClassificationList = new SizeClassificationList(n);
         this.counterList = new CounterMonitor[ni];
         for(int i = 0; i < ni; i++)
             counterList[i] = new CounterMonitor();
@@ -38,11 +40,6 @@ public class ThreadMaster extends AbstractThread{
     public void run(){
             try {
                 while(true) {
-                    if(start) {
-                        for(int i = 0; i < threadArray.length; i++)
-                            (threadArray[i] = new ThreadSlave(this)).start();
-                        start = false;
-                    }
                     if(state.readState() == StateMonitor.StateEnum.START) {
                         long time = System.currentTimeMillis();
                         File file = new File(d);
@@ -56,28 +53,7 @@ public class ThreadMaster extends AbstractThread{
                             filesToReadList.put(d);
                             switch (state.readState()) {
                                 case CONTINUE -> {
-                                    System.out.println("Fine, tempo: " + (System.currentTimeMillis() - time));
-                                    System.out.println();
-                                    String prova;
-                                    for (int i = n - 1; i >= 0; i--) {
-                                        prova = sizeClassificationList.read(i);
-                                        System.out.println(String.valueOf(n - i) + ")" +
-                                                " " + prova.subSequence(maxCaracters + 1, prova.length())
-                                                + " - " + prova.subSequence(
-                                                58 - (int) prova.charAt(maxCaracters), maxCaracters)
-                                        );
-                                    }
-                                    System.out.println();
-                                    System.out.println();
-                                    for (int i = 0; i < ni; i++)
-                                        if (i != (ni - 1) && i != (ni - 2))
-                                            System.out.println("range: " + (maxl / ni * i) + "-" + (maxl / ni * (i + 1) - 1) + " = " + counterList[i].read());
-                                        else if (i == (ni - 2))
-                                            System.out.println("range: " + (maxl / ni * i) + "-" + (maxl - 1) + " = " + counterList[i].read());
-                                        else
-                                            System.out.println("range: " + maxl + "-... = " + counterList[i].read());
-                                    System.out.println();
-                                    System.out.println();
+                                    stampa(time);
                                 }
                                 case OFF -> {
                                     for (Thread t : threadArray)
@@ -87,25 +63,43 @@ public class ThreadMaster extends AbstractThread{
                                 default -> {
                                     filesToReadList.reset();
                                     state.readState();
-
-//                                    for(Thread t : threadArray)
-//                                        filesToReadList.put(commitSuicideMessage);
-//                                    for(Thread t : threadArray)
-//                                        t.join();
-//                                    filesToReadList.reset();
-//                                    start = true;
+                                    filesToReadList.activate();
                                 }
                             }
                         }
                     }
-                    else{
-                        for (Thread t : threadArray)
-                            filesToReadList.put(commitSuicideMessage);
-                        return;
-                    }
+                    else
+                        break;
                 }
+                for (Thread t : threadArray)
+                    filesToReadList.put(commitSuicideMessage);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
+    }
+
+    public void stampa(long time) throws InterruptedException {
+        System.out.println("Fine, tempo: " + (System.currentTimeMillis() - time));
+        System.out.println();
+        String prova;
+        for (int i = n - 1; i >= 0; i--) {
+            prova = sizeClassificationList.read(i);
+            System.out.println(String.valueOf(n - i) + ")" +
+                    " " + prova.subSequence(maxCaracters + 1, prova.length())
+                    + " - " + prova.subSequence(
+                    58 - (int) prova.charAt(maxCaracters), maxCaracters)
+            );
+        }
+        System.out.println();
+        System.out.println();
+        for (int i = 0; i < ni; i++)
+            if (i != (ni - 1) && i != (ni - 2))
+                System.out.println("range: " + (maxl / ni * i) + "-" + (maxl / ni * (i + 1) - 1) + " = " + counterList[i].read());
+            else if (i == (ni - 2))
+                System.out.println("range: " + (maxl / ni * i) + "-" + (maxl - 1) + " = " + counterList[i].read());
+            else
+                System.out.println("range: " + maxl + "-... = " + counterList[i].read());
+        System.out.println();
+        System.out.println();
     }
 }
