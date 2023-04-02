@@ -21,12 +21,8 @@ public class UmboundedListMonitor {
         return this.list.remove(0);
     }
 
-    public synchronized boolean isEmpty(){
-        return this.list.isEmpty();
-    }
-
-    public void decrementActiveMonitorCounter(){
-        if(counter.decrement() == 0 && isEmpty())
+    public synchronized void decrementActiveMonitorCounter(){
+        if(counter.decrement() == 0 && this.list.isEmpty())
             stateMainThread.changeState(StateMonitor.StateEnum.CONTINUE);
     }
 
