@@ -54,6 +54,8 @@ public class ThreadMaster extends AbstractThread{
                             switch (state.readState()) {
                                 case CONTINUE -> stampa(time);
                                 case OFF -> {
+                                    filesToReadList.reset();
+                                    state.readState();
                                     for (Thread t : threadArray)
                                         filesToReadList.put(commitSuicideMessage);
                                     return;
