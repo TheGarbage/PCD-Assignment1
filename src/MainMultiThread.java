@@ -16,6 +16,8 @@ public class MainMultiThread {
         Thread.sleep(1000);
         threadMaster.initialializzation("G:\\Università\\Non_Date\\Programmazione concorrente\\Prova 1\\TestFolder2", 2, 20, 2);
         Thread.sleep(2000);
+        threadMaster.initialializzation("G:\\Università\\Non_Date\\Programmazione concorrente\\Prova 1\\TestFolder2", 2, 20, 2);
+        Thread.sleep(50);
         state.changeState(StateMonitor.StateEnum.OFF);
     }
 }

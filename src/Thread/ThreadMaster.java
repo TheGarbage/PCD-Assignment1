@@ -51,20 +51,15 @@ public class ThreadMaster extends AbstractThread{
                             for (ThreadSlave t : threadArray)
                                 t.inizializza();
                             filesToReadList.put(d);
-                            switch (state.readState()) {
-                                case CONTINUE -> stampa(time);
-                                case OFF -> {
-                                    filesToReadList.reset();
-                                    state.readState();
-                                    for (Thread t : threadArray)
-                                        filesToReadList.put(commitSuicideMessage);
-                                    return;
-                                }
-                                default -> {
-                                    filesToReadList.reset();
-                                    state.readState();
-                                    filesToReadList.activate();
-                                }
+                            StateMonitor.StateEnum stateEnum= state.readState();
+                            if(stateEnum == StateMonitor.StateEnum.CONTINUE)
+                                stampa(time);
+                            else {
+                                filesToReadList.reset();
+                                state.readState();
+                                filesToReadList.activate();
+                                if(stateEnum == StateMonitor.StateEnum.OFF)
+                                    break;
                             }
                         }
                     }
