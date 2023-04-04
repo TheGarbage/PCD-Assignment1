@@ -23,7 +23,7 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
     JButton stop = new JButton("Stop");
     JFileChooser fileChooser = new JFileChooser("/");
 
-    public View(int w, int h) {
+    public View() {
         super("PCD-Assignment1");
         setSize(1200, 800);
         JPanel panelParameter = new JPanel();
