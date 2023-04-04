@@ -1,4 +1,3 @@
-import Monitor.StateMonitor;
 import View.View;
 
 public class MainView {

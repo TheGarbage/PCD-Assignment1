@@ -7,7 +7,7 @@ import java.util.Collections;
 
 public class MainSequenziale {
 
-    static String d = "G:\\Università\\Non_Date\\Programmazione concorrente\\Prova 1\\TestFolder2";
+    static String d = "C:\\Users\\gugli\\OneDrive\\Università\\Magistrale\\Non_Date\\Programmazione concorrente\\PCD-Assignment1\\TestFolder2";
     static int ni = 5;
     static int n = 10;
     static int maxl = 100;
