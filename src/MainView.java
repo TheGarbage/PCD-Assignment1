@@ -1,10 +1,8 @@
-import View.View;
+import Thread.ThreadMaster;
 
 public class MainView {
 
     public static void main(String[] args) throws InterruptedException {
-        javax.swing.SwingUtilities.invokeLater(() -> {
-            (new View()).setVisible(true);
-        });
+        ThreadMaster threadMaster = new ThreadMaster();
     }
 }

@@ -1,11 +1,14 @@
 package View;
 
+import Monitor.StateMonitor;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
+import Thread.ThreadMaster;
 
 public class View extends JFrame implements ActionListener, WindowListener, ChangeListener{
     JSpinner n = new JSpinner(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
@@ -22,8 +25,10 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
     JButton start = new JButton("Start");
     JButton stop = new JButton("Stop");
     JFileChooser fileChooser = new JFileChooser("/");
+    StateMonitor stateMain;
+    ThreadMaster threadMaster;
 
-    public View() {
+    public View(ThreadMaster threadMaster, StateMonitor stateMain) {
         super("PCD-Assignment1");
         setSize(1200, 800);
         JPanel panelParameter = new JPanel();
@@ -32,7 +37,7 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         panelParameter.add(new JLabel("    maxl: "));
         panelParameter.add(maxl);
         panelParameter.add(new JLabel("    ni: "));
-        ni.addItem(1);
+        ni.addItem(2);
         ni.setPrototypeDisplayValue(1111111);
         panelParameter.add(ni);
         ((JSpinner.DefaultEditor) n.getEditor()).getTextField().setColumns(5);
@@ -45,7 +50,7 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         stop.setEnabled(false);
         bottonPanel.add(BorderLayout.WEST, start);
         bottonPanel.add(BorderLayout.EAST, stop);
-        bottonPanel.setBorder(new EmptyBorder(10, 135, 10, 60));
+        bottonPanel.setBorder(new EmptyBorder(10, 115, 10, 80));
 
         JPanel panelSelector = new JPanel();
         directory.setEditable(false);
@@ -64,7 +69,9 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         JPanel panelCenter = new JPanel();
         panelCenter.setLayout(new BorderLayout());
         list.setEditable(false);
+        list.setBorder(new EmptyBorder(20, 20, 20, 20));
         counters.setEditable(false);
+        counters.setBorder(new EmptyBorder(20, 20, 20, 20));
         countersScroll.setBorder(BorderFactory.createLineBorder(Color.black));
         countersScroll.setBorder(new EmptyBorder(10, 20, 10, 20));
         listScroll.setBorder(BorderFactory.createLineBorder(Color.black));
@@ -96,31 +103,29 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         maxl.addChangeListener(this);
         start.addActionListener(this);
         stop.addActionListener(this);
+        this.threadMaster = threadMaster;
+        this.stateMain = stateMain;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == selezionaDirecotory) {
             if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                SwingUtilities.invokeLater(() -> {
-                    directory.setText(fileChooser.getSelectedFile().getAbsolutePath());
-                    if (directory.getText().length() > 35)
-                        SwingUtilities.updateComponentTreeUI(this);
-                });
+                directory.setText(fileChooser.getSelectedFile().getAbsolutePath());
+                if (directory.getText().length() > 35)
+                    SwingUtilities.updateComponentTreeUI(this);
                 start.setEnabled(true);
             }
         }
         else if(e.getSource() == start){
-            SwingUtilities.invokeLater(() -> {
-                start(false);
-                state.setText("Processing...");
-            });
+            start(false);
+            threadMaster.initialializzation(directory.getText(), (Integer)n.getValue(), (int) maxl.getValue(), (int) ni.getSelectedItem());
+            state.setText("Processing...");
         }
         else if(e.getSource() == stop){
-            SwingUtilities.invokeLater(() -> {
-                start(true);
-                state.setText("Stopped");
-            });
+            start(true);
+            stateMain.changeState(StateMonitor.StateEnum.START);
+            state.setText("Stopped");
         }
     }
 
@@ -139,7 +144,7 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
 
     @Override
     public void windowClosing(WindowEvent e) {
-        System.out.println("Ciao");
+        stateMain.changeState(StateMonitor.StateEnum.OFF);
         dispose();
         System.exit(0);
     }
@@ -167,15 +172,31 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
     @Override
     public void stateChanged(ChangeEvent e) {
         if (e.getSource() == maxl) {
-            SwingUtilities.invokeLater(() -> {
-                ni.removeAllItems();
-                ni.addItem(1);
-                int maxlValue = (int) maxl.getValue();
-                for (int i = 2; i < maxlValue; i++)
-                    if (maxlValue % i == 0)
-                        ni.addItem(i);
-                ni.addItem(maxlValue);
-            });
+            ni.removeAllItems();
+            int maxlValue = (int) maxl.getValue();
+            for (int i = 2; i < maxlValue; i++)
+                if (maxlValue % i == 0)
+                    ni.addItem(i);
+            ni.addItem(maxlValue);
         }
+    }
+
+    public void setFinish(String text){
+        SwingUtilities.invokeLater(() -> {
+            start(true);
+            state.setText(text);
+        });
+    }
+
+    public void setListText(String text){
+        SwingUtilities.invokeLater(() -> {
+            list.setText(text);
+        });
+    }
+
+    public void setCountersText(String text){
+        SwingUtilities.invokeLater(() -> {
+            counters.setText(text);
+        });
     }
 }

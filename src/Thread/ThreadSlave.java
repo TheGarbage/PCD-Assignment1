@@ -12,6 +12,7 @@ public class ThreadSlave extends AbstractThread {
     public ThreadSlave(ThreadMaster threadMaster){
         this.threadMaster = threadMaster;
         this.cod = "0000000000";
+        this.start();
     }
 
     public void inizializza(){

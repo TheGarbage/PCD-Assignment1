@@ -4,6 +4,7 @@ import Monitor.CounterMonitor;
 import Monitor.SizeClassificationList;
 import Monitor.StateMonitor;
 import Monitor.FilesToReadList;
+import View.View;
 
 import java.io.File;
 
@@ -11,16 +12,16 @@ public class ThreadMaster extends AbstractThread{
 
     private String d;
     private final ThreadSlave[] threadArray;
-    final private StateMonitor state;
+    final private StateMonitor state = new StateMonitor();
+    View myView;
 
 
-    public ThreadMaster(StateMonitor state){
+    public ThreadMaster(){
         super();
         this.threadArray = new ThreadSlave[Runtime.getRuntime().availableProcessors()];
         this.filesToReadList = new FilesToReadList(state);
         for(int i = 0; i < threadArray.length; i++)
-            (threadArray[i] = new ThreadSlave(this)).start();
-        this.state = state;
+            threadArray[i] = new ThreadSlave(this);
         this.start();
     }
 
@@ -39,6 +40,10 @@ public class ThreadMaster extends AbstractThread{
     @Override
     public void run(){
             try {
+                this.myView = new View(this, state);
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    this.myView.setVisible(true);
+                });
                 while(true) {
                     if(state.readState() == StateMonitor.StateEnum.START) {
                         long time = System.currentTimeMillis();
@@ -74,27 +79,24 @@ public class ThreadMaster extends AbstractThread{
     }
 
     public void stampa(long time) throws InterruptedException {
-        System.out.println("Fine, tempo: " + (System.currentTimeMillis() - time));
-        System.out.println();
-        String prova;
-        for (int i = n - 1; i >= 0; i--) {
-            prova = sizeClassificationList.read(i);
-            System.out.println((n - i) + ")" +
-                    " " + prova.subSequence(maxCaracters + 1, prova.length())
-                    + " - " + prova.subSequence(
-                    58 - (int) prova.charAt(maxCaracters), maxCaracters)
-            );
+        String item, text = "";
+        for (int i = n - 1; i >= 0; i--) { // Deve adattarsi alla dimensione della lista
+            item = sizeClassificationList.read(i);
+            text += (n - i) + ")" +
+                    " " + item.subSequence(maxCaracters + 1, item.length())
+                    + " - " + item.subSequence(
+                    58 - (int) item.charAt(maxCaracters), maxCaracters) + "\n";
         }
-        System.out.println();
-        System.out.println();
+        myView.setListText(text);
+        text = "";
         for (int i = 0; i < ni; i++)
             if (i != (ni - 1) && i != (ni - 2))
-                System.out.println("range: " + (maxl / ni * i) + "-" + (maxl / ni * (i + 1) - 1) + " = " + counterList[i].read());
+                text += "range: " + (maxl / ni * i) + "-" + (maxl / ni * (i + 1) - 1) + " = " + counterList[i].read() + "\n";
             else if (i == (ni - 2))
-                System.out.println("range: " + (maxl / ni * i) + "-" + (maxl - 1) + " = " + counterList[i].read());
+                text += "range: " + (maxl / ni * i) + "-" + (maxl - 1) + " = " + counterList[i].read() + "\n";
             else
-                System.out.println("range: " + maxl + "-... = " + counterList[i].read());
-        System.out.println();
-        System.out.println();
+                text += "range: " + maxl + "-... = " + counterList[i].read() + "\n";
+        myView.setCountersText(text);
+        myView.setFinish("Fine, tempo: " + (System.currentTimeMillis() - time));
     }
 }
