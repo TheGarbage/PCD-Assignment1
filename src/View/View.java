@@ -9,7 +9,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
-import Thread.ThreadMaster;
 
 public class View extends JFrame implements ActionListener, WindowListener, ChangeListener{
     JSpinner n = new JSpinner(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
@@ -190,20 +189,14 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
     }
 
     public void setListText(String text){
-        SwingUtilities.invokeLater(() -> {
-            list.setText(text);
-        });
+        SwingUtilities.invokeLater(() -> list.setText(text));
     }
 
     public void setCountersText(String text){
-        SwingUtilities.invokeLater(() -> {
-            counters.setText(text);
-        });
+        SwingUtilities.invokeLater(() -> counters.setText(text));
     }
 
     public void open(){
-        javax.swing.SwingUtilities.invokeLater(() -> {
-            this.setVisible(true);
-        });
+        javax.swing.SwingUtilities.invokeLater(() -> this.setVisible(true));
     }
 }

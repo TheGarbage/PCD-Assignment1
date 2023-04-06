@@ -40,7 +40,6 @@ public class DataMonitor {
 
     public String creaStringCounters(){
         String text = "";
-        text = "";
         for (int i = 0; i < ni; i++)
             if (i != (ni - 1) && i != (ni - 2))
                 text += "range: " + (maxl / ni * i) + "-" + (maxl / ni * (i + 1) - 1) + " = " + counterList[i].read() + "\n";

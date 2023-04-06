@@ -10,7 +10,7 @@ public class SizeClassificationList {
         this.maxSize = maxSize;
     }
 
-    public synchronized boolean put(String item) throws InterruptedException { // Sistemare
+    public synchronized boolean put(String item){ // Sistemare
         boolean added = false;
         if(list.size() == maxSize) {
             if (item.compareTo(list.get(0)) > 0) {
