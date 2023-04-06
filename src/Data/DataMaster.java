@@ -49,9 +49,9 @@ public class DataMaster {
         if(ni < maxl) {
             for (int i = 0; i < ni; i++)
                 if (i != (ni - 1) && i != (ni - 2))
-                    text += "range: " + (maxl / ni * i) + "-" + (maxl / ni * (i + 1) - 1) + " = " + counterList[i].read() + "\n";
+                    text += "range: " + (maxl / (ni - 1) * i) + "-" + (maxl / (ni - 1) * (i + 1) - 1) + " = " + counterList[i].read() + "\n";
                 else if (i == (ni - 2))
-                    text += "range: " + (maxl / ni * i) + "-" + (maxl - 1) + " = " + counterList[i].read() + "\n";
+                    text += "range: " + (maxl / (ni - 1) * i) + "-" + (maxl - 1) + " = " + counterList[i].read() + "\n";
                 else
                     text += "range: " + maxl + "-... = " + counterList[i].read() + "\n";
         }
