@@ -1,4 +1,4 @@
-import Thread.ThreadMaster;
+import Threads.ThreadMaster;
 
 public class MainView {
 

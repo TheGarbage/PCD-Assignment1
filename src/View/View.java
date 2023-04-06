@@ -1,7 +1,8 @@
 package View;
 
-import Monitor.DataMonitor;
-import Monitor.StateMonitor;
+import Data.DataMaster;
+import Monitors.StateMonitor;
+import Utilities.StateEnum;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -25,10 +26,10 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
     JButton start = new JButton("Start");
     JButton stop = new JButton("Stop");
     JFileChooser fileChooser = new JFileChooser("/");
-    final DataMonitor dataMonitor;
+    final DataMaster dataMaster;
     final StateMonitor stateMain;
 
-    public View(DataMonitor dataMonitor) {
+    public View(DataMaster dataMaster) {
         super("PCD-Assignment1");
         setSize(1200, 800);
         JPanel panelParameter = new JPanel();
@@ -37,7 +38,7 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         panelParameter.add(new JLabel("    maxl: "));
         panelParameter.add(maxl);
         panelParameter.add(new JLabel("    ni: "));
-        ni.addItem(2);
+        ni.addItem(3);
         ni.setPrototypeDisplayValue(1111111);
         panelParameter.add(ni);
         ((JSpinner.DefaultEditor) n.getEditor()).getTextField().setColumns(5);
@@ -103,8 +104,8 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         maxl.addChangeListener(this);
         start.addActionListener(this);
         stop.addActionListener(this);
-        this.dataMonitor = dataMonitor;
-        this.stateMain = dataMonitor.getState();
+        this.dataMaster = dataMaster;
+        this.stateMain = dataMaster.getState();
     }
 
     @Override
@@ -119,12 +120,12 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         }
         else if(e.getSource() == start){
             start(false);
-            dataMonitor.initialializzation(directory.getText(), (Integer)n.getValue(), (int) maxl.getValue(), (int) ni.getSelectedItem());
+            dataMaster.initialializzation(directory.getText(), (Integer)n.getValue(), (int) maxl.getValue(), (int) ni.getSelectedItem());
             state.setText("Processing...");
         }
         else if(e.getSource() == stop){
             start(true);
-            stateMain.changeState(StateMonitor.StateEnum.START);
+            stateMain.changeState(StateEnum.START);
             state.setText("Stopped");
         }
     }
@@ -144,7 +145,7 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
 
     @Override
     public void windowClosing(WindowEvent e) {
-        stateMain.changeState(StateMonitor.StateEnum.OFF);
+        stateMain.changeState(StateEnum.OFF);
         dispose();
         System.exit(0);
     }
@@ -174,10 +175,15 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         if (e.getSource() == maxl) {
             ni.removeAllItems();
             int maxlValue = (int) maxl.getValue();
-            for (int i = 2; i < maxlValue; i++)
-                if (maxlValue % i == 0)
-                    ni.addItem(i);
-            ni.addItem(maxlValue);
+            if(maxlValue == 2)
+                ni.addItem(3);
+            else {
+                for (int i = 1; i < maxlValue; i++)
+                    if (maxlValue % i == 0)
+                        ni.addItem(i + 1);
+                if (maxlValue < Integer.MAX_VALUE)
+                    ni.addItem(maxlValue + 1);
+            }
         }
     }
 
