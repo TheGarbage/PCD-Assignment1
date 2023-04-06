@@ -31,7 +31,7 @@ public class FilesToReadList {
 
     public synchronized void reset(){
         list.clear();
-        list.add("Pass"); // Cosi ho la certezza che almeno uno attivo ci sarà
+        list.add(DataMonitor.skipMessagge); // Cosi ho la certezza che almeno uno attivo ci sarà
         active = false;
     }
 

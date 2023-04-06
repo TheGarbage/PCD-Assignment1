@@ -1,53 +1,42 @@
 package Thread;
 
+import Monitor.DataMonitor;
+import Monitor.FilesToReadList;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class ThreadSlave extends AbstractThread {
-    ThreadMaster threadMaster;
-    final String cod;
+public class ThreadSlave extends Thread{
+    DataMonitor dataMonitor;
+    final FilesToReadList filesToReadList;
 
-    public ThreadSlave(ThreadMaster threadMaster){
-        this.threadMaster = threadMaster;
-        this.cod = "0000000000";
+    public ThreadSlave(DataMonitor dataMonitor){
+        this.dataMonitor = dataMonitor;
+        this.filesToReadList = dataMonitor.getFilesToReadList();
         this.start();
-    }
-
-    public void inizializza(){
-        this.sizeClassificationList = threadMaster.sizeClassificationList;
-        this.counterList = threadMaster.counterList;
-        this.n = threadMaster.n;
-        this.maxl = threadMaster.maxl;
-        this.ni = threadMaster.ni;
     }
 
     @Override
     public void run() {
-        this.filesToReadList = threadMaster.filesToReadList;
-
         File file;
-        long lines;
+        int lines;
         String item;
         String path;
 
         while(true) {
             try {
                 path = this.filesToReadList.get();
-                if (path.equals(commitSuicideMessage)) break;
-                else if(!path.equals("Pass")) {
+                if (path.equals(DataMonitor.terminationMessage)) break;
+                else if(!path.equals(DataMonitor.skipMessagge)) {
                     if (path.endsWith(".java")) {
                         BufferedReader reader = new BufferedReader(new FileReader(path));
                         lines = 0;
                         while (reader.readLine() != null) lines++;
                         reader.close();
-                        item = cod.substring(0, maxCaracters - String.valueOf(lines).length()) + lines + String.valueOf(lines).length() + path;
-                        sizeClassificationList.put(item);
-                        if (lines < this.maxl)
-                            this.counterList[(int) lines / (this.maxl / (this.ni - 1))].increment();
-                        else
-                            this.counterList[this.ni - 1].increment();
+                        item = DataMonitor.stringPrefix.substring(0, DataMonitor.maxCaracters - String.valueOf(lines).length()) + lines + String.valueOf(lines).length() + (new File(path)).getName();
+                        dataMonitor.aggiungiFile(item, lines);
                     }
                     else {
                         file = new File(path);

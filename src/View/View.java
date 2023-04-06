@@ -1,5 +1,6 @@
 package View;
 
+import Monitor.DataMonitor;
 import Monitor.StateMonitor;
 
 import javax.swing.*;
@@ -25,10 +26,10 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
     JButton start = new JButton("Start");
     JButton stop = new JButton("Stop");
     JFileChooser fileChooser = new JFileChooser("/");
-    StateMonitor stateMain;
-    ThreadMaster threadMaster;
+    final DataMonitor dataMonitor;
+    final StateMonitor stateMain;
 
-    public View(ThreadMaster threadMaster, StateMonitor stateMain) {
+    public View(DataMonitor dataMonitor) {
         super("PCD-Assignment1");
         setSize(1200, 800);
         JPanel panelParameter = new JPanel();
@@ -103,8 +104,8 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         maxl.addChangeListener(this);
         start.addActionListener(this);
         stop.addActionListener(this);
-        this.threadMaster = threadMaster;
-        this.stateMain = stateMain;
+        this.dataMonitor = dataMonitor;
+        this.stateMain = dataMonitor.getState();
     }
 
     @Override
@@ -119,7 +120,7 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         }
         else if(e.getSource() == start){
             start(false);
-            threadMaster.initialializzation(directory.getText(), (Integer)n.getValue(), (int) maxl.getValue(), (int) ni.getSelectedItem());
+            dataMonitor.initialializzation(directory.getText(), (Integer)n.getValue(), (int) maxl.getValue(), (int) ni.getSelectedItem());
             state.setText("Processing...");
         }
         else if(e.getSource() == stop){
@@ -197,6 +198,12 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
     public void setCountersText(String text){
         SwingUtilities.invokeLater(() -> {
             counters.setText(text);
+        });
+    }
+
+    public void open(){
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            this.setVisible(true);
         });
     }
 }
