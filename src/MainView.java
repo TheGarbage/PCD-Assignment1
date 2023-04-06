@@ -2,7 +2,7 @@ import Threads.ThreadMaster;
 
 public class MainView {
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args){
         new ThreadMaster();
     }
 }
