@@ -8,6 +8,8 @@ import Utilities.ThreadConstants;
 import View.View;
 import Utilities.StateEnum;
 
+import java.io.File;
+
 public class ThreadMaster extends Thread{
 
     final ThreadSlave[] threadArray;
@@ -43,16 +45,27 @@ public class ThreadMaster extends Thread{
                 while(true) {
                     if(stateMain.readState() == StateEnum.START) {
                         long time = System.currentTimeMillis();
-                        filesToReadList.put(dataMaster.getD()); // Inizia il lavoro
-                        StateEnum stateEnum= stateMain.readState();
-                        if(stateEnum == StateEnum.CONTINUE)
-                            myView.setFinish("Fine, tempo: " + (System.currentTimeMillis() - time));
+                        String path = dataMaster.getD();
+                        File[] directoryFiles = (new File(path).listFiles());
+                        if (directoryFiles == null)
+                            myView.setFinish(" Invalid directory Selected");
+                        else if(directoryFiles.length == 0)
+                            myView.setFinish(" The selected directory is empty");
                         else {
-                            filesToReadList.reset();
-                            stateMain.readState();
-                            filesToReadList.activate();
-                            if(stateEnum == StateEnum.OFF)
-                                break;
+                            filesToReadList.put(path); // Inizia il lavoro
+                            StateEnum stateEnum = stateMain.readState();
+                            if (stateEnum == StateEnum.CONTINUE)
+                                if(dataMaster.sizeClassificationListIsEmpty())
+                                    myView.setFinish(" No java files in the directory");
+                                else
+                                    myView.setFinish(" Time to finish: " + (System.currentTimeMillis() - time));
+                            else {
+                                filesToReadList.reset();
+                                stateMain.readState();
+                                filesToReadList.activate();
+                                if (stateEnum == StateEnum.OFF)
+                                    break;
+                            }
                         }
                     }
                     else

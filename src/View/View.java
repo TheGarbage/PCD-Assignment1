@@ -10,6 +10,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
+import java.lang.reflect.InvocationTargetException;
 
 public class View extends JFrame implements ActionListener, WindowListener, ChangeListener{
     final String rankingTitle = "-------------------   RANKING -------------------";
@@ -37,8 +38,10 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         setSize(600, 600);
         JPanel panelParameter = new JPanel();
         panelParameter.add(new JLabel("N: "));
+        n.setEditor(new JSpinner.DefaultEditor(n));
         panelParameter.add(n);
         panelParameter.add(new JLabel("          MAXL: "));
+        maxl.setEditor(new JSpinner.DefaultEditor(maxl));
         panelParameter.add(maxl);
         panelParameter.add(new JLabel("          NI: "));
         ni.addItem(3);
@@ -74,9 +77,9 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         panelCenter.add(BorderLayout.EAST, countersScroll);
 
         JPanel infoPanel = new JPanel();
-        state.setText(" Idle");
+        state.setText(" Parameter entry");
         state.setEditable(false);
-        state.setColumns(15);
+        state.setColumns(20);
         infoPanel.add(new JLabel("State: "));
         infoPanel.add(state);
         infoPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -124,6 +127,7 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
                 else
                     directory.setText(path);
                 start.setEnabled(true);
+                state.setText(" Waiting to start");
             }
         }
         else if(e.getSource() == start){
@@ -192,7 +196,6 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
                 if (maxlValue < Integer.MAX_VALUE)
                     ni.addItem(maxlValue + 1);
             }
-            SwingUtilities.updateComponentTreeUI(this);
         }
     }
 
@@ -203,12 +206,12 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         });
     }
 
-    public void setListText(String text){
-        SwingUtilities.invokeLater(() -> list.setText(rankingTitle + "\n\n" + text));
+    public void setListText(String text) throws InterruptedException, InvocationTargetException {
+        SwingUtilities.invokeAndWait(() -> list.setText(rankingTitle + "\n\n" + text));
     }
 
-    public void setCountersText(String text){
-        SwingUtilities.invokeLater(() -> counters.setText(intervalsTitle + "\n\n" + text));
+    public void setCountersText(String text) throws InterruptedException, InvocationTargetException {
+        SwingUtilities.invokeAndWait(() -> counters.setText(intervalsTitle + "\n\n" + text));
     }
 
     public void open(){

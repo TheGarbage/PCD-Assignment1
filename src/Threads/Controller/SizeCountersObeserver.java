@@ -4,6 +4,8 @@ import Data.DataMaster;
 import Monitors.StateMonitor;
 import View.View;
 
+import java.lang.reflect.InvocationTargetException;
+
 public class SizeCountersObeserver extends AbstractObserver{
     public SizeCountersObeserver(View myView, DataMaster dataMaster){
         super(myView, dataMaster);
@@ -15,7 +17,7 @@ public class SizeCountersObeserver extends AbstractObserver{
     }
 
     @Override
-    void updateMyView(){
+    void updateMyView() throws InterruptedException, InvocationTargetException {
         myView.setCountersText(this.dataManster.creaStringCounters());
     }
 }

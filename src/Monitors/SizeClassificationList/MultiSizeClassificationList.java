@@ -45,4 +45,9 @@ public class MultiSizeClassificationList implements SizeClassificationListMonito
         while (list.isEmpty()) wait();
         return (ArrayList<String>)this.list.clone();
     }
+
+    @Override
+    public boolean isEmpty() {
+        return list.isEmpty();
+    }
 }

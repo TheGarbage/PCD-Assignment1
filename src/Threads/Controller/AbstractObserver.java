@@ -5,6 +5,8 @@ import Monitors.StateMonitor;
 import View.View;
 import Utilities.StateEnum;
 
+import java.lang.reflect.InvocationTargetException;
+
 public abstract class AbstractObserver extends Thread{
     final long timeForSeconds = 30;
     final long interval = 1000 / timeForSeconds;
@@ -29,7 +31,7 @@ public abstract class AbstractObserver extends Thread{
                     updateMyView();
                 else
                     return;
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | InvocationTargetException e) {
                 throw new RuntimeException(e);
             }
             if (duration < interval) {
@@ -43,5 +45,5 @@ public abstract class AbstractObserver extends Thread{
     }
 
     abstract StateMonitor getStateMonitor();
-    abstract void updateMyView() throws InterruptedException;
+    abstract void updateMyView() throws InterruptedException, InvocationTargetException;
 }

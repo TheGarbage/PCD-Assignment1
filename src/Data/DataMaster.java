@@ -47,20 +47,21 @@ public class DataMaster {
     public String creaStringCounters(){
         String text = "";
         if(ni < maxl) {
-            for (int i = 0; i < ni; i++)
-                if (i != (ni - 1) && i != (ni - 2))
-                    text += "range: " + (maxl / (ni - 1) * i) + "-" + (maxl / (ni - 1) * (i + 1) - 1) + " = " + counterList[i].read() + "\n";
-                else if (i == (ni - 2))
-                    text += "range: " + (maxl / (ni - 1) * i) + "-" + (maxl - 1) + " = " + counterList[i].read() + "\n";
+            for (int i = 0; i < ni; i++) {
+                text = text.concat("- Interval [ ");
+                if (i != (ni - 1))
+                    text =  text.concat((maxl / (ni - 1) * i) + " - " + (maxl / (ni - 1) * (i + 1) - 1));
                 else
-                    text += "range: " + maxl + "-... = " + counterList[i].read() + "\n";
+                    text = text.concat(maxl + " - inf");
+                text = text.concat(" ]:   " + counterList[i].read() + "\n");
+            }
         }
         else {
             for (int i = 0; i < ni; i++)
                 if (i == maxl)
-                    text += "n righe maggiori di " + maxl +  ": = " + counterList[i].read() + "\n";
+                    text = text.concat(" - " + maxl +  " row(s): =   " + counterList[i].read() + "\n");
                 else
-                    text += "n righe pari a: " + i + " = " + counterList[i].read() + "\n";
+                    text = text.concat(" - " + i + " row(s): =   " + counterList[i].read() + "\n");
         }
 
         return text;
@@ -73,12 +74,12 @@ public class DataMaster {
             Collections.sort(list);
         for (int i = list.size() - 1; i >= 0; i--) { // Deve adattarsi alla dimensione della lista
             item = list.get(i);
-            text += (n - i) + ")" +
+            text = text.concat((n - i) + ")" +
                     " " +
                     item.subSequence(58 - (int) item.charAt(ThreadConstants.MAX_DIGITS), ThreadConstants.MAX_DIGITS) +
                     " - " +
                     item.subSequence(ThreadConstants.MAX_DIGITS + 1, item.length()) +
-                    "\n";
+                    "\n");
         }
         return text;
     }
@@ -112,5 +113,9 @@ public class DataMaster {
     // Variable getter
     public String getD() {
         return d;
+    }
+
+    public boolean sizeClassificationListIsEmpty() throws InterruptedException {
+        return sizeClassificationList.isEmpty();
     }
 }

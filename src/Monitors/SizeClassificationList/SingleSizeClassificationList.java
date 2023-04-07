@@ -17,9 +17,16 @@ public class SingleSizeClassificationList implements SizeClassificationListMonit
     }
 
     @Override
-    public ArrayList<String> read(){
+    public synchronized ArrayList<String> read(){
         ArrayList<String> list = new ArrayList<String>(); // Non c'è bisogno di attesa perchè si attiva al primo cambio
         list.add(maxSizeFile);
         return list;
     }
+
+    @Override
+    public boolean isEmpty() {
+        return maxSizeFile.equals(ThreadConstants.STRING_PREFIX);
+    }
+
+
 }

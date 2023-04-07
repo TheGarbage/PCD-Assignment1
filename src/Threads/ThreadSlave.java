@@ -42,7 +42,7 @@ public class ThreadSlave extends Thread{
                     else {
                         file = new File(path);
                         for (File f : file.listFiles())
-                            if (f.getName().endsWith(".java") || f.listFiles() != null)
+                            if (f.getName().endsWith(".java") || (f.listFiles() != null && f.listFiles().length > 0))
                                 this.filesToReadList.put(f.getPath());
                     }
                 }
