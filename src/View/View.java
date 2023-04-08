@@ -8,11 +8,13 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.lang.reflect.InvocationTargetException;
 
-public class View extends JFrame implements ActionListener, WindowListener, ChangeListener{
+public class View extends JFrame implements ActionListener, WindowListener, ChangeListener, PopupMenuListener {
     final String rankingTitle = "-------------------   RANKING -------------------";
     final String intervalsTitle = "----------   INTERVALS DIVISION   ----------";
     final int maxSizePath = 45;
@@ -38,10 +40,8 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         setSize(600, 600);
         JPanel parametersPanel = new JPanel();
         parametersPanel.add(new JLabel("N: "));
-        n.setEditor(new JSpinner.DefaultEditor(n));
         parametersPanel.add(n);
         parametersPanel.add(new JLabel("          MAXL: "));
-        maxl.setEditor(new JSpinner.DefaultEditor(maxl));
         parametersPanel.add(maxl);
         parametersPanel.add(new JLabel("          NI: "));
         ni.addItem(3);
@@ -111,6 +111,7 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         addWindowListener(this);
         directoryButton.addActionListener(this);
         maxl.addChangeListener(this);
+        ni.addPopupMenuListener(this);
         startButton.addActionListener(this);
         stopButton.addActionListener(this);
 
@@ -182,16 +183,10 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
     public void stateChanged(ChangeEvent e) {
         if (e.getSource() == maxl) {
             ni.removeAllItems();
-            int maxlValue = (int) maxl.getValue();
-            if(maxlValue == 2)
+            if((int) maxl.getValue() == 2)
                 ni.addItem(3);
-            else {
-                for (int i = 1; i < maxlValue; i++)
-                    if (maxlValue % i == 0)
-                        ni.addItem(i + 1);
-                if (maxlValue < Integer.MAX_VALUE)
-                    ni.addItem(maxlValue + 1);
-            }
+            else
+                ni.addItem(2);
         }
     }
 
@@ -231,5 +226,32 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
 
     public void openWindow(){
         javax.swing.SwingUtilities.invokeLater(() -> this.setVisible(true));
+    }
+
+    @Override
+    public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+        if (e.getSource() == ni) {
+            ni.removeAllItems();
+            int maxlValue = (int) maxl.getValue();
+            if(maxlValue == 2)
+                ni.addItem(3);
+            else {
+                for (int i = 1; i < maxlValue; i++)
+                    if (maxlValue % i == 0)
+                        ni.addItem(i + 1);
+                if (maxlValue < Integer.MAX_VALUE)
+                    ni.addItem(maxlValue + 1);
+            }
+        }
+    }
+
+    @Override
+    public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+
+    }
+
+    @Override
+    public void popupMenuCanceled(PopupMenuEvent e) {
+
     }
 }
