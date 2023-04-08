@@ -62,7 +62,7 @@ public class ThreadMaster extends Thread{
                                 if (dataMonitor.sizeClassificationListIsEmpty())
                                     myView.setFinish(" No java files in the directory");
                                 else
-                                    myView.setFinish(" Time to finish: " + (System.currentTimeMillis() - time));
+                                    myView.setFinish(" Time to finish: " + (System.currentTimeMillis() - time) + "ms");
                             }
                             else { // Only stop or off is possible (start button is still disable)
                                 filesToReadList.reset();
