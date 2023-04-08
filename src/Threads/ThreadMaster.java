@@ -87,6 +87,7 @@ public class ThreadMaster extends Thread{
                 rankingListObserver.join();
                 stateSizeCountersObserver.changeState(StateEnum.OFF);
                 sizeCountersObeserver.join();
+                System.out.println("All threads terminated");
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

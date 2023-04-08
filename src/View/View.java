@@ -13,6 +13,7 @@ import javax.swing.event.PopupMenuListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 
 public class View extends JFrame implements ActionListener, WindowListener, ChangeListener, PopupMenuListener {
     final String rankingTitle = "-------------------   RANKING -------------------";
@@ -231,11 +232,13 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
     @Override
     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
         if (e.getSource() == ni) {
-            ni.removeAllItems();
+            try {
+                maxl.commitEdit();
+            } catch (ParseException ex) {
+                throw new RuntimeException(ex);
+            }
             int maxlValue = (int) maxl.getValue();
-            if(maxlValue == 2)
-                ni.addItem(3);
-            else {
+            if(maxlValue != 2) {
                 for (int i = 1; i < maxlValue; i++)
                     if (maxlValue % i == 0)
                         ni.addItem(i + 1);
