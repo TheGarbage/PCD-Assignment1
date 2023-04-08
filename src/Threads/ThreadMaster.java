@@ -11,7 +11,7 @@ import Utilities.StateEnum;
 import java.io.File;
 
 public class ThreadMaster extends Thread{
-
+    final int nSlavesThread = Runtime.getRuntime().availableProcessors();
     final ThreadSlave[] threadArray;
     RankingListObserver rankingListObserver;
     SizeCountersObeserver sizeCountersObeserver;
@@ -25,7 +25,7 @@ public class ThreadMaster extends Thread{
 
     public ThreadMaster(){
         super();
-        this.threadArray = new ThreadSlave[Runtime.getRuntime().availableProcessors()];
+        this.threadArray = new ThreadSlave[nSlavesThread];
         for(int i = 0; i < threadArray.length; i++)
             threadArray[i] = new ThreadSlave(this.dataMonitor);
         filesToReadList = dataMonitor.getFilesToReadList();
@@ -45,7 +45,7 @@ public class ThreadMaster extends Thread{
                 StateEnum stateEnum;
                 while(true) {
                     stateEnum = stateMain.readState();
-                    if(stateMain.readState() == StateEnum.START) {
+                    if(stateEnum == StateEnum.START) {
                         long time = System.currentTimeMillis();
                         String path = dataMonitor.getD();
                         File[] directoryFiles = (new File(path).listFiles());
@@ -79,10 +79,14 @@ public class ThreadMaster extends Thread{
                     else
                         break;
                 }
-                for (Thread t : threadArray)
+                for(int i = 0; i < nSlavesThread; i++)
                     filesToReadList.put(ThreadConstants.TERMINATION_MESSAGE);
+                for (Thread t : threadArray)
+                    t.join();
                 stateRankingListObserver.changeState(StateEnum.OFF);
+                rankingListObserver.join();
                 stateSizeCountersObserver.changeState(StateEnum.OFF);
+                sizeCountersObeserver.join();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

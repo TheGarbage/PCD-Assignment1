@@ -133,7 +133,11 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         }
         else if(e.getSource() == startButton){
             setIdle(false);
-            dataMonitor.initialializzation(directorySelected.getText(), (Integer)n.getValue(), (int) maxl.getValue(), (int) ni.getSelectedItem());
+            try {
+                dataMonitor.initialializzation(fileChooser.getSelectedFile().getAbsolutePath(), (Integer)n.getValue(), (int) maxl.getValue(), (int) ni.getSelectedItem());
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
             processState.setText(" Initializzation...");
         }
         else if(e.getSource() == stopButton){

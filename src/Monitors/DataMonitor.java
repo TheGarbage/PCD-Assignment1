@@ -26,7 +26,11 @@ public class DataMonitor {
     int ni;
     String d;
 
-    public synchronized void initialializzation(String d, int n, int maxl, int ni){
+    // Writers-Readers
+    int nReader = 0;
+
+    public synchronized void initialializzation(String d, int n, int maxl, int ni) throws InterruptedException {
+        while(nReader > 0) wait();
         if(n == 1)
             this.sizeClassificationList = new SingleSizeClassificationList();
         else
@@ -41,7 +45,10 @@ public class DataMonitor {
         this.state.changeState(StateEnum.START);
     }
 
-    public synchronized String creaStringCounters(){
+    public String creaStringCounters(){
+        synchronized(this){
+            nReader++;
+        }
         String text = "";
         if(ni < maxl) {
             for (int i = 0; i < ni; i++) {
@@ -60,11 +67,17 @@ public class DataMonitor {
                 else
                     text = text.concat(" - " + i + " row(s): =   " + counterList[i].read() + "\n");
         }
-
+        synchronized(this){
+            nReader--;
+            notify();
+        }
         return text;
     }
 
-    public synchronized String creaStringList() throws InterruptedException {
+    public String creaStringList() throws InterruptedException {
+        synchronized(this){
+            nReader++;
+        }
         String item, text = "";
         ArrayList<String> list = sizeClassificationList.read();
         if(list.size() < n && list.size() != 1)
@@ -77,6 +90,10 @@ public class DataMonitor {
                     " - " +
                     item.subSequence(ThreadConstants.MAX_DIGITS + 1, item.length()) +
                     "\n");
+        }
+        synchronized(this){
+            nReader--;
+            notify();
         }
         return text;
     }
@@ -101,11 +118,11 @@ public class DataMonitor {
         return filesToReadList;
     }
 
-    public synchronized StateMonitor getListHasChanged() {
+    public StateMonitor getListHasChanged() {
         return listHasChanged;
     }
 
-    public synchronized StateMonitor getCountersHasChanged() {
+    public StateMonitor getCountersHasChanged() {
         return countersHasChanged;
     }
 
