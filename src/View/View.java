@@ -214,9 +214,7 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
     }
 
     public void disableStop(){
-        SwingUtilities.invokeLater(() -> {
-            stopButton.setEnabled(false);
-        });
+        SwingUtilities.invokeLater(() -> stopButton.setEnabled(false));
     }
 
     public void setRankingText(String text) throws InterruptedException, InvocationTargetException {
