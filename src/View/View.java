@@ -1,6 +1,6 @@
 package View;
 
-import Data.DataMaster;
+import Monitors.DataMonitor;
 import Monitors.StateMonitor;
 import Utilities.StateEnum;
 
@@ -19,136 +19,128 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
 
     JSpinner n = new JSpinner(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
     JSpinner maxl = new JSpinner(new SpinnerNumberModel(2, 2, Integer.MAX_VALUE, 1));
-    JTextArea state = new JTextArea();
-    JTextArea directory = new JTextArea(" No directory selected");
     JComboBox<Integer> ni = new JComboBox<Integer>();
-    JButton selezionaDirecotory = new JButton("   Select Direcotory   ");
-    JTextArea list = new JTextArea(rankingTitle, 1, 22);
-    JScrollPane listScroll = new JScrollPane(list);
-    JTextArea counters = new JTextArea(intervalsTitle, 1, 22);
-    JScrollPane countersScroll = new JScrollPane(counters);
-    JButton start = new JButton("   Start   ");
-    JButton stop = new JButton("   Stop   ");
+    JTextArea processState = new JTextArea();
+    JTextArea directorySelected = new JTextArea(" No directory selected");
+    JButton directoryButton = new JButton("   Select Direcotory   ");
+    JTextArea rankingText = new JTextArea(rankingTitle, 1, 22);
+    JScrollPane rankingScrollPane = new JScrollPane(rankingText);
+    JTextArea intervalsText = new JTextArea(intervalsTitle, 1, 22);
+    JScrollPane intervalsScrollPane = new JScrollPane(intervalsText);
+    JButton startButton = new JButton("   Start   ");
+    JButton stopButton = new JButton("   Stop   ");
     JFileChooser fileChooser = new JFileChooser("/");
-    final DataMaster dataMaster;
-    final StateMonitor stateMain;
+    final DataMonitor dataMonitor;
+    final StateMonitor stateThreadMaster;
 
-    public View(DataMaster dataMaster) {
+    public View(DataMonitor dataMonitor) {
         super("PCD-Assignment1");
         setSize(600, 600);
-        JPanel panelParameter = new JPanel();
-        panelParameter.add(new JLabel("N: "));
+        JPanel parametersPanel = new JPanel();
+        parametersPanel.add(new JLabel("N: "));
         n.setEditor(new JSpinner.DefaultEditor(n));
-        panelParameter.add(n);
-        panelParameter.add(new JLabel("          MAXL: "));
+        parametersPanel.add(n);
+        parametersPanel.add(new JLabel("          MAXL: "));
         maxl.setEditor(new JSpinner.DefaultEditor(maxl));
-        panelParameter.add(maxl);
-        panelParameter.add(new JLabel("          NI: "));
+        parametersPanel.add(maxl);
+        parametersPanel.add(new JLabel("          NI: "));
         ni.addItem(3);
         ni.setPrototypeDisplayValue(1111111);
-        panelParameter.add(ni);
+        parametersPanel.add(ni);
         ((JSpinner.DefaultEditor) n.getEditor()).getTextField().setColumns(5);
         ((JSpinner.DefaultEditor) maxl.getEditor()).getTextField().setColumns(5);
-        panelParameter.setBorder(new EmptyBorder(10, 10, 10, 10));
+        parametersPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        JPanel panelSelector = new JPanel();
-        directory.setEditable(false);
-        directory.setColumns(30);
-        panelSelector.add(directory);
-        panelSelector.add(selezionaDirecotory);
-        panelSelector.setBorder(new EmptyBorder(10, 10, 15, 10));
+        JPanel selectorPanel = new JPanel();
+        directorySelected.setEditable(false);
+        directorySelected.setColumns(30);
+        selectorPanel.add(directorySelected);
+        selectorPanel.add(directoryButton);
+        selectorPanel.setBorder(new EmptyBorder(10, 10, 15, 10));
 
-        JPanel panelNord = new JPanel();
-        panelNord.setLayout(new BorderLayout());
-        panelNord.add(BorderLayout.NORTH, panelSelector);
-        panelNord.add(BorderLayout.SOUTH, panelParameter);
+        JPanel northPanel = new JPanel();
+        northPanel.setLayout(new BorderLayout());
+        northPanel.add(BorderLayout.NORTH, selectorPanel);
+        northPanel.add(BorderLayout.SOUTH, parametersPanel);
 
-        JPanel panelCenter = new JPanel();
-        panelCenter.setLayout(new BorderLayout());
-        list.setEditable(false);
-        list.setBorder(new EmptyBorder(10, 10, 10, 10));
-        counters.setEditable(false);
-        counters.setBorder(new EmptyBorder(10, 10, 10, 10));
-        countersScroll.setBorder(BorderFactory.createLineBorder(Color.black));
-        countersScroll.setBorder(new EmptyBorder(10, 10, 10, 10));
-        listScroll.setBorder(BorderFactory.createLineBorder(Color.black));
-        listScroll.setBorder(new EmptyBorder(10, 10, 10, 10));
-        panelCenter.add(BorderLayout.WEST, listScroll);
-        panelCenter.add(BorderLayout.EAST, countersScroll);
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BorderLayout());
+        rankingText.setEditable(false);
+        rankingText.setBorder(new EmptyBorder(10, 10, 10, 10));
+        intervalsText.setEditable(false);
+        intervalsText.setBorder(new EmptyBorder(10, 10, 10, 10));
+        intervalsScrollPane.setBorder(BorderFactory.createLineBorder(Color.black));
+        intervalsScrollPane.setBorder(new EmptyBorder(10, 10, 10, 10));
+        rankingScrollPane.setBorder(BorderFactory.createLineBorder(Color.black));
+        rankingScrollPane.setBorder(new EmptyBorder(10, 10, 10, 10));
+        centerPanel.add(BorderLayout.WEST, rankingScrollPane);
+        centerPanel.add(BorderLayout.EAST, intervalsScrollPane);
 
         JPanel infoPanel = new JPanel();
-        state.setText(" Parameter entry");
-        state.setEditable(false);
-        state.setColumns(20);
+        processState.setText(" Parameter entry");
+        processState.setEditable(false);
+        processState.setColumns(20);
         infoPanel.add(new JLabel("State: "));
-        infoPanel.add(state);
+        infoPanel.add(processState);
         infoPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        JPanel bottonPanel = new JPanel();
-        bottonPanel.setLayout(new BorderLayout());
-        start.setEnabled(false);
-        stop.setEnabled(false);
-        bottonPanel.add(BorderLayout.WEST, start);
-        bottonPanel.add(BorderLayout.EAST, stop);
-        bottonPanel.setBorder(new EmptyBorder(10, 380, 10, 10));
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BorderLayout());
+        startButton.setEnabled(false);
+        stopButton.setEnabled(false);
+        buttonPanel.add(BorderLayout.WEST, startButton);
+        buttonPanel.add(BorderLayout.EAST, stopButton);
+        buttonPanel.setBorder(new EmptyBorder(10, 380, 10, 10));
 
-        JPanel panelSouth = new JPanel();
-        panelSouth.setLayout(new BorderLayout());
-        panelSouth.add(BorderLayout.NORTH, infoPanel);
-        panelSouth.add(BorderLayout.SOUTH, bottonPanel);
+        JPanel southPanel = new JPanel();
+        southPanel.setLayout(new BorderLayout());
+        southPanel.add(BorderLayout.NORTH, infoPanel);
+        southPanel.add(BorderLayout.SOUTH, buttonPanel);
 
 
-        JPanel panelMain = new JPanel();
-        panelMain.setLayout(new BorderLayout());
-        panelMain.add(BorderLayout.NORTH, panelNord);
-        panelMain.add(BorderLayout.CENTER, panelCenter);
-        panelMain.add(BorderLayout.SOUTH, panelSouth);
-        panelMain.setBorder(new EmptyBorder(10, 10, 10, 10));
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.add(BorderLayout.NORTH, northPanel);
+        mainPanel.add(BorderLayout.CENTER, centerPanel);
+        mainPanel.add(BorderLayout.SOUTH, southPanel);
+        mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        setContentPane(panelMain);
+        setContentPane(mainPanel);
 
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         addWindowListener(this);
-        selezionaDirecotory.addActionListener(this);
+        directoryButton.addActionListener(this);
         maxl.addChangeListener(this);
-        start.addActionListener(this);
-        stop.addActionListener(this);
-        this.dataMaster = dataMaster;
-        this.stateMain = dataMaster.getState();
+        startButton.addActionListener(this);
+        stopButton.addActionListener(this);
+
+        this.dataMonitor = dataMonitor;
+        this.stateThreadMaster = dataMonitor.getState();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == selezionaDirecotory) {
+        if (e.getSource() == directoryButton) {
             if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
                 String path = fileChooser.getSelectedFile().getAbsolutePath();
                 if (path.length() > maxSizePath)
-                    directory.setText(" ..." + path.substring(path.length() - maxSizePath));
+                    directorySelected.setText(" ..." + path.substring(path.length() - maxSizePath));
                 else
-                    directory.setText(path);
-                start.setEnabled(true);
-                state.setText(" Waiting to start");
+                    directorySelected.setText(path);
+                startButton.setEnabled(true);
+                processState.setText(" Waiting to start");
             }
         }
-        else if(e.getSource() == start){
-            start(false);
-            dataMaster.initialializzation(directory.getText(), (Integer)n.getValue(), (int) maxl.getValue(), (int) ni.getSelectedItem());
-            state.setText(" Processing...");
+        else if(e.getSource() == startButton){
+            setIdle(false);
+            dataMonitor.initialializzation(directorySelected.getText(), (Integer)n.getValue(), (int) maxl.getValue(), (int) ni.getSelectedItem());
+            processState.setText(" Initializzation...");
         }
-        else if(e.getSource() == stop){
-            start(true);
-            stateMain.changeState(StateEnum.START);
-            state.setText(" Stopped");
+        else if(e.getSource() == stopButton){
+            stopButton.setEnabled(false);
+            stateThreadMaster.changeState(StateEnum.STOP);
+            processState.setText(" Stopping...");
         }
-    }
-
-    private void start(boolean enable){
-        n.setEnabled(enable);
-        ni.setEnabled(enable);
-        maxl.setEnabled(enable);
-        selezionaDirecotory.setEnabled(enable);
-        start.setEnabled(enable);
-        stop.setEnabled(!enable);
     }
 
     @Override
@@ -157,7 +149,7 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
 
     @Override
     public void windowClosing(WindowEvent e) {
-        stateMain.changeState(StateEnum.OFF);
+        stateThreadMaster.changeState(StateEnum.OFF);
         dispose();
         System.exit(0);
     }
@@ -199,22 +191,43 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         }
     }
 
-    public void setFinish(String text){
+    private void setIdle(boolean enable){
+        n.setEnabled(enable);
+        ni.setEnabled(enable);
+        maxl.setEnabled(enable);
+        directoryButton.setEnabled(enable);
+        startButton.setEnabled(enable);
+    }
+
+    public void setProcessing(){
         SwingUtilities.invokeLater(() -> {
-            start(true);
-            state.setText(text);
+            stopButton.setEnabled(true);
+            processState.setText(" Processing...");
         });
     }
 
-    public void setListText(String text) throws InterruptedException, InvocationTargetException {
-        SwingUtilities.invokeAndWait(() -> list.setText(rankingTitle + "\n\n" + text));
+    public void setFinish(String text){
+        SwingUtilities.invokeLater(() -> {
+            setIdle(true);
+            processState.setText(text);
+        });
     }
 
-    public void setCountersText(String text) throws InterruptedException, InvocationTargetException {
-        SwingUtilities.invokeAndWait(() -> counters.setText(intervalsTitle + "\n\n" + text));
+    public void disableStop(){
+        SwingUtilities.invokeLater(() -> {
+            stopButton.setEnabled(false);
+        });
     }
 
-    public void open(){
+    public void setRankingText(String text) throws InterruptedException, InvocationTargetException {
+        SwingUtilities.invokeAndWait(() -> rankingText.setText(rankingTitle + "\n\n" + text));
+    }
+
+    public void setIntervalsText(String text) throws InterruptedException, InvocationTargetException {
+        SwingUtilities.invokeAndWait(() -> intervalsText.setText(intervalsTitle + "\n\n" + text));
+    }
+
+    public void openWindow(){
         javax.swing.SwingUtilities.invokeLater(() -> this.setVisible(true));
     }
 }

@@ -1,14 +1,14 @@
 package Threads.Controller;
 
-import Data.DataMaster;
+import Monitors.DataMonitor;
 import Monitors.StateMonitor;
 import View.View;
 
 import java.lang.reflect.InvocationTargetException;
 
 public class RankingListObserver extends AbstractObserver{
-    public RankingListObserver(View myView, DataMaster dataMaster) {
-        super(myView, dataMaster);
+    public RankingListObserver(View myView, DataMonitor dataMonitor) {
+        super(myView, dataMonitor);
     }
 
     @Override
@@ -18,6 +18,6 @@ public class RankingListObserver extends AbstractObserver{
 
     @Override
     void updateMyView() throws InterruptedException, InvocationTargetException {
-        myView.setListText(this.dataManster.creaStringList());
+        myView.setRankingText(this.dataManster.creaStringList());
     }
 }

@@ -1,6 +1,6 @@
 package Threads;
 
-import Data.DataMaster;
+import Monitors.DataMonitor;
 import Monitors.FilesToReadList;
 import Utilities.ThreadConstants;
 
@@ -10,10 +10,10 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class ThreadSlave extends Thread{
-    DataMaster dataManster;
+    DataMonitor dataManster;
     final FilesToReadList filesToReadList;
 
-    public ThreadSlave(DataMaster dataManster){
+    public ThreadSlave(DataMonitor dataManster){
         this.dataManster = dataManster;
         this.filesToReadList = dataManster.getFilesToReadList();
         this.start();

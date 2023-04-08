@@ -1,14 +1,14 @@
 package Threads.Controller;
 
-import Data.DataMaster;
+import Monitors.DataMonitor;
 import Monitors.StateMonitor;
 import View.View;
 
 import java.lang.reflect.InvocationTargetException;
 
 public class SizeCountersObeserver extends AbstractObserver{
-    public SizeCountersObeserver(View myView, DataMaster dataMaster){
-        super(myView, dataMaster);
+    public SizeCountersObeserver(View myView, DataMonitor dataMonitor){
+        super(myView, dataMonitor);
     }
 
     @Override
@@ -18,6 +18,6 @@ public class SizeCountersObeserver extends AbstractObserver{
 
     @Override
     void updateMyView() throws InterruptedException, InvocationTargetException {
-        myView.setCountersText(this.dataManster.creaStringCounters());
+        myView.setIntervalsText(this.dataManster.creaStringCounters());
     }
 }

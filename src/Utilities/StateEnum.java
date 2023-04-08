@@ -1,5 +1,5 @@
 package Utilities;
 
 public enum StateEnum {
-    OFF, WAIT, START, CONTINUE
+    OFF, WAIT, START, CONTINUE, STOP
 }

@@ -1,6 +1,6 @@
 package Threads;
 
-import Data.DataMaster;
+import Monitors.DataMonitor;
 import Monitors.*;
 import Threads.Controller.SizeCountersObeserver;
 import Threads.Controller.RankingListObserver;
@@ -16,7 +16,7 @@ public class ThreadMaster extends Thread{
     RankingListObserver rankingListObserver;
     SizeCountersObeserver sizeCountersObeserver;
     View myView;
-    final DataMaster dataMaster = new DataMaster();
+    final DataMonitor dataMonitor = new DataMonitor();
     final FilesToReadList filesToReadList;
     final StateMonitor stateMain;
     final StateMonitor stateSizeCountersObserver;
@@ -27,47 +27,55 @@ public class ThreadMaster extends Thread{
         super();
         this.threadArray = new ThreadSlave[Runtime.getRuntime().availableProcessors()];
         for(int i = 0; i < threadArray.length; i++)
-            threadArray[i] = new ThreadSlave(this.dataMaster);
-        filesToReadList = dataMaster.getFilesToReadList();
-        stateMain = dataMaster.getState();
-        stateSizeCountersObserver = dataMaster.getCountersHasChanged();
-        stateRankingListObserver = dataMaster.getListHasChanged();
+            threadArray[i] = new ThreadSlave(this.dataMonitor);
+        filesToReadList = dataMonitor.getFilesToReadList();
+        stateMain = dataMonitor.getState();
+        stateSizeCountersObserver = dataMonitor.getCountersHasChanged();
+        stateRankingListObserver = dataMonitor.getListHasChanged();
         this.start();
     }
 
     @Override
     public void run(){
             try {
-                this.myView = new View(dataMaster);
-                this.myView.open();
-                rankingListObserver = new RankingListObserver(myView, dataMaster);
-                sizeCountersObeserver = new SizeCountersObeserver(myView, dataMaster);
+                this.myView = new View(dataMonitor);
+                this.myView.openWindow();
+                rankingListObserver = new RankingListObserver(myView, dataMonitor);
+                sizeCountersObeserver = new SizeCountersObeserver(myView, dataMonitor);
+                StateEnum stateEnum;
                 while(true) {
+                    stateEnum = stateMain.readState();
                     if(stateMain.readState() == StateEnum.START) {
                         long time = System.currentTimeMillis();
-                        String path = dataMaster.getD();
+                        String path = dataMonitor.getD();
                         File[] directoryFiles = (new File(path).listFiles());
                         if (directoryFiles == null)
                             myView.setFinish(" Invalid directory Selected");
                         else if(directoryFiles.length == 0)
                             myView.setFinish(" The selected directory is empty");
                         else {
+                            myView.setProcessing();
                             filesToReadList.put(path); // Inizia il lavoro
-                            StateEnum stateEnum = stateMain.readState();
-                            if (stateEnum == StateEnum.CONTINUE)
-                                if(dataMaster.sizeClassificationListIsEmpty())
+                            stateEnum = stateMain.readState();
+                            if (stateEnum == StateEnum.CONTINUE) {
+                                myView.disableStop();
+                                if (dataMonitor.sizeClassificationListIsEmpty())
                                     myView.setFinish(" No java files in the directory");
                                 else
                                     myView.setFinish(" Time to finish: " + (System.currentTimeMillis() - time));
-                            else {
+                            }
+                            else { // Only stop or off is possible (start button is still disable)
                                 filesToReadList.reset();
                                 stateMain.readState();
                                 filesToReadList.activate();
                                 if (stateEnum == StateEnum.OFF)
                                     break;
+                                myView.setFinish(" Stopped");
                             }
                         }
                     }
+                    else if(stateEnum == StateEnum.STOP)
+                        myView.setFinish(" Stopped after termination");
                     else
                         break;
                 }

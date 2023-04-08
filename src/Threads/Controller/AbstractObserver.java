@@ -1,6 +1,6 @@
 package Threads.Controller;
 
-import Data.DataMaster;
+import Monitors.DataMonitor;
 import Monitors.StateMonitor;
 import View.View;
 import Utilities.StateEnum;
@@ -12,9 +12,9 @@ public abstract class AbstractObserver extends Thread{
     final long interval = 1000 / timeForSeconds;
     final StateMonitor stateMonitor;
     final View myView;
-    final DataMaster dataManster;
+    final DataMonitor dataManster;
 
-    public AbstractObserver(View myView, DataMaster dataManster){
+    public AbstractObserver(View myView, DataMonitor dataManster){
         this.myView = myView;
         this.dataManster = dataManster;
         this.stateMonitor = getStateMonitor();

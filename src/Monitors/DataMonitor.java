@@ -1,18 +1,15 @@
-package Data;
+package Monitors;
 
-import Monitors.CounterMonitor;
-import Monitors.FilesToReadList;
 import Monitors.SizeClassificationList.MultiSizeClassificationList;
 import Monitors.SizeClassificationList.SingleSizeClassificationList;
 import Monitors.SizeClassificationList.SizeClassificationListMonitor;
-import Monitors.StateMonitor;
 import Utilities.StateEnum;
 import Utilities.ThreadConstants;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class DataMaster {
+public class DataMonitor {
     // Final Monitor
     final StateMonitor state = new StateMonitor();
     final FilesToReadList filesToReadList = new FilesToReadList(state);
@@ -29,7 +26,7 @@ public class DataMaster {
     int ni;
     String d;
 
-    public void initialializzation(String d, int n, int maxl, int ni){
+    public synchronized void initialializzation(String d, int n, int maxl, int ni){
         if(n == 1)
             this.sizeClassificationList = new SingleSizeClassificationList();
         else
@@ -44,7 +41,7 @@ public class DataMaster {
         this.state.changeState(StateEnum.START);
     }
 
-    public String creaStringCounters(){
+    public synchronized String creaStringCounters(){
         String text = "";
         if(ni < maxl) {
             for (int i = 0; i < ni; i++) {
@@ -67,12 +64,12 @@ public class DataMaster {
         return text;
     }
 
-    public String creaStringList() throws InterruptedException {
+    public synchronized String creaStringList() throws InterruptedException {
         String item, text = "";
         ArrayList<String> list = sizeClassificationList.read();
         if(list.size() < n && list.size() != 1)
             Collections.sort(list);
-        for (int i = list.size() - 1; i >= 0; i--) { // Deve adattarsi alla dimensione della lista
+        for (int i = list.size() - 1; i >= 0; i--) {
             item = list.get(i);
             text = text.concat((n - i) + ")" +
                     " " +
@@ -84,6 +81,7 @@ public class DataMaster {
         return text;
     }
 
+    // No synchronized method
     public void aggiungiFile(String item, int lines) throws InterruptedException {
         if(sizeClassificationList.put(item))
             listHasChanged.changeState(StateEnum.START);
@@ -94,6 +92,7 @@ public class DataMaster {
         countersHasChanged.changeState(StateEnum.START);
     }
 
+    // Constant getter
     public StateMonitor getState() {
         return state;
     }
@@ -102,11 +101,11 @@ public class DataMaster {
         return filesToReadList;
     }
 
-    public StateMonitor getListHasChanged() {
+    public synchronized StateMonitor getListHasChanged() {
         return listHasChanged;
     }
 
-    public StateMonitor getCountersHasChanged() {
+    public synchronized StateMonitor getCountersHasChanged() {
         return countersHasChanged;
     }
 
