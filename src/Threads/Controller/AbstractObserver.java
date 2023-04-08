@@ -25,7 +25,6 @@ public abstract class AbstractObserver extends Thread{
     public void run() {
         while(true) {
             long startTime = System.currentTimeMillis();
-            long duration = System.currentTimeMillis() - startTime;
             try {
                 if(stateMonitor.readState() == StateEnum.START)
                     updateMyView();
@@ -34,6 +33,7 @@ public abstract class AbstractObserver extends Thread{
             } catch (InterruptedException | InvocationTargetException e) {
                 throw new RuntimeException(e);
             }
+            long duration = System.currentTimeMillis() - startTime;
             if (duration < interval) {
                 try {
                     sleep(interval - duration);
