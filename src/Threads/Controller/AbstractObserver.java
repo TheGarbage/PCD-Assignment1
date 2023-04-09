@@ -2,14 +2,14 @@ package Threads.Controller;
 
 import Monitors.DataMonitor;
 import Monitors.StateMonitor;
+import Utilities.ThreadConstants;
 import View.View;
 import Utilities.StateEnum;
 
 import java.lang.reflect.InvocationTargetException;
 
 public abstract class AbstractObserver extends Thread{
-    final long timeForSeconds = 30;
-    final long interval = 1000 / timeForSeconds;
+    final long targetTimeDifference = 1000 / ThreadConstants.timeForSecondsGuiUpdate;
     final StateMonitor stateMonitor;
     final View myView;
     final DataMonitor dataManster;
@@ -34,9 +34,9 @@ public abstract class AbstractObserver extends Thread{
                 throw new RuntimeException(e);
             }
             long timeDifference = System.currentTimeMillis() - startTime;
-            if (timeDifference < interval) {
+            if (timeDifference < targetTimeDifference) {
                 try {
-                    sleep(interval - timeDifference);
+                    sleep(targetTimeDifference - timeDifference);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
