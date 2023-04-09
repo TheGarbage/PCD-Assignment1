@@ -33,10 +33,10 @@ public abstract class AbstractObserver extends Thread{
             } catch (InterruptedException | InvocationTargetException e) {
                 throw new RuntimeException(e);
             }
-            long duration = System.currentTimeMillis() - startTime;
-            if (duration < interval) {
+            long timeDifference = System.currentTimeMillis() - startTime;
+            if (timeDifference < interval) {
                 try {
-                    sleep(interval - duration);
+                    sleep(interval - timeDifference);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
