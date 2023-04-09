@@ -63,7 +63,7 @@ public class DataMonitor {
         else {
             for (int i = 0; i < ni; i++)
                 if (i == maxl)
-                    text = text.concat(" - " + maxl +  " row(s): =   " + counterList[i].read() + "\n");
+                    text = text.concat(" - more than" + maxl +  " row(s): =   " + counterList[i].read() + "\n");
                 else
                     text = text.concat(" - " + i + " row(s): =   " + counterList[i].read() + "\n");
         }
