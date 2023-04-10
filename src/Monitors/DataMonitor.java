@@ -12,7 +12,7 @@ import java.util.Collections;
 public class DataMonitor {
     // Final Monitor
     final StateMonitor state = new StateMonitor();
-    final FilesToReadList filesToReadList = new FilesToReadList(state);
+    final PathsToReadList pathsToReadList = new PathsToReadList(state);
     final StateMonitor listHasChanged = new StateMonitor();
     final StateMonitor countersHasChanged = new StateMonitor();
 
@@ -120,8 +120,8 @@ public class DataMonitor {
         return state;
     }
 
-    public FilesToReadList getFilesToReadList() {
-        return filesToReadList;
+    public PathsToReadList getFilesToReadList() {
+        return pathsToReadList;
     }
 
     public StateMonitor getListHasChanged() {

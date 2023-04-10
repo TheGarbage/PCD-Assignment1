@@ -4,13 +4,13 @@ import Utilities.ThreadConstants;
 
 import java.util.ArrayList;
 
-public class FilesToReadList {
+public class PathsToReadList {
     final ArrayList<String> list = new ArrayList<>();
-    CounterMonitor counter = new CounterMonitor();
+    CounterMonitor nActiveSlaveThread = new CounterMonitor();
     final StateMonitor stateMainThread;
     private boolean active = true;
 
-    public FilesToReadList(StateMonitor stateMainThread){
+    public PathsToReadList(StateMonitor stateMainThread){
         this.stateMainThread = stateMainThread;
     }
 
@@ -23,12 +23,12 @@ public class FilesToReadList {
 
     public synchronized String get() throws InterruptedException {
         while (list.isEmpty()) wait();
-        counter.increment();
+        nActiveSlaveThread.increment();
         return this.list.remove(0);
     }
 
     public synchronized void decrementActiveMonitorCounter(){
-        if(counter.decrement() == 0 && this.list.isEmpty())
+        if(nActiveSlaveThread.decrement() == 0 && this.list.isEmpty())
             stateMainThread.changeState(StateEnum.CONTINUE);
     }
 

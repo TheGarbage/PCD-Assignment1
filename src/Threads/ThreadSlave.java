@@ -1,7 +1,7 @@
 package Threads;
 
 import Monitors.DataMonitor;
-import Monitors.FilesToReadList;
+import Monitors.PathsToReadList;
 import Utilities.ThreadConstants;
 
 import java.io.BufferedReader;
@@ -11,11 +11,11 @@ import java.io.IOException;
 
 public class ThreadSlave extends Thread{
     DataMonitor dataManster;
-    final FilesToReadList filesToReadList;
+    final PathsToReadList pathsToReadList;
 
     public ThreadSlave(DataMonitor dataManster){
         this.dataManster = dataManster;
-        this.filesToReadList = dataManster.getFilesToReadList();
+        this.pathsToReadList = dataManster.getFilesToReadList();
         this.start();
     }
 
@@ -28,7 +28,7 @@ public class ThreadSlave extends Thread{
 
         while(true) {
             try {
-                path = this.filesToReadList.get();
+                path = this.pathsToReadList.get();
                 if (path.equals(ThreadConstants.TERMINATION_MESSAGE)) break;
                 else if(!path.equals(ThreadConstants.SKIP_MESSAGE)) {
                     if (path.endsWith(".java")) {
@@ -43,10 +43,10 @@ public class ThreadSlave extends Thread{
                         file = new File(path);
                         for (File f : file.listFiles())
                             if (f.getName().endsWith(".java") || (f.listFiles() != null && f.listFiles().length > 0))
-                                this.filesToReadList.put(f.getPath());
+                                this.pathsToReadList.put(f.getPath());
                     }
                 }
-                this.filesToReadList.decrementActiveMonitorCounter();
+                this.pathsToReadList.decrementActiveMonitorCounter();
             } catch (InterruptedException | IOException e) {
                 throw new RuntimeException(e);
             }
