@@ -18,7 +18,7 @@ public class DataMonitor {
 
     // Variable Monitor
     SizeClassificationListMonitor sizeClassificationList;
-    CounterMonitor[] counterList;
+    CounterMonitor[] countersArray;
 
     // Parameters
     int n;
@@ -35,9 +35,9 @@ public class DataMonitor {
             this.sizeClassificationList = new SingleSizeClassificationList();
         else
             this.sizeClassificationList = new MultiSizeClassificationList(n);
-        this.counterList = new CounterMonitor[ni];
+        this.countersArray = new CounterMonitor[ni];
         for(int i = 0; i < ni; i++)
-            counterList[i] = new CounterMonitor();
+            countersArray[i] = new CounterMonitor();
         this.d = d;
         this.n = n;
         this.maxl = maxl;
@@ -46,30 +46,36 @@ public class DataMonitor {
     }
 
     public String creaStringCounters(){
+        int i;
+        ArrayList<Integer> countersList = new ArrayList<>();
         synchronized(this){
             nReader++;
         }
+        for (i = 0; i < ni; i++)
+            countersList.add(countersArray[i].read());
+        synchronized(this){
+            nReader--;
+            notify();
+        }
         String text = "";
         if(ni < maxl) {
-            for (int i = 0; i < ni; i++) {
+            for (i = 0; i < ni; i++) {
                 text = text.concat("- Interval [ ");
                 if (i != (ni - 1))
                     text =  text.concat((maxl / (ni - 1) * i) + " - " + (maxl / (ni - 1) * (i + 1) - 1));
                 else
                     text = text.concat(maxl + " - inf");
-                text = text.concat(" ]:   " + counterList[i].read() + "\n");
+                text = text.concat(" ]:   " + countersList.get(i) + "\n");
             }
         }
         else {
-            for (int i = 0; i < ni; i++)
+            for (i = 0; i < ni; i++) {
                 if (i == maxl)
-                    text = text.concat(" - more than" + maxl +  " row(s): =   " + counterList[i].read() + "\n");
+                    text = text.concat(" - more than" + maxl);
                 else
-                    text = text.concat(" - " + i + " row(s): =   " + counterList[i].read() + "\n");
-        }
-        synchronized(this){
-            nReader--;
-            notify();
+                    text = text.concat(" - " + i);
+                text = text.concat(" row(s): =   " + countersList.get(i) + "\n");
+            }
         }
         return text;
     }
@@ -78,8 +84,12 @@ public class DataMonitor {
         synchronized(this){
             nReader++;
         }
-        String item, text = "";
         ArrayList<String> list = sizeClassificationList.read();
+        synchronized(this){
+            nReader--;
+            notify();
+        }
+        String item, text = "";
         if(list.size() < n && list.size() != 1)
             Collections.sort(list);
         for (int i = list.size() - 1; i >= 0; i--) {
@@ -91,10 +101,6 @@ public class DataMonitor {
                     item.subSequence(ThreadConstants.MAX_DIGITS + 1, item.length()) +
                     "\n");
         }
-        synchronized(this){
-            nReader--;
-            notify();
-        }
         return text;
     }
 
@@ -103,9 +109,9 @@ public class DataMonitor {
         if(sizeClassificationList.put(item))
             listHasChanged.changeState(StateEnum.START);
         if (lines < this.maxl)
-            this.counterList[lines / (this.maxl / (this.ni - 1))].increment();
+            this.countersArray[lines / (this.maxl / (this.ni - 1))].increment();
         else
-            this.counterList[this.ni - 1].increment();
+            this.countersArray[this.ni - 1].increment();
         countersHasChanged.changeState(StateEnum.START);
     }
 

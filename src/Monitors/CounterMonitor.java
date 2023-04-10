@@ -2,17 +2,17 @@ package Monitors;
 
 public class CounterMonitor {
 
-    long count = 0;
+    int count = 0;
 
     public synchronized void increment(){
         count++;
     }
 
-    public synchronized long decrement(){
+    public synchronized int decrement(){
         return --count;
     }
 
-    public synchronized long read(){ //Saranno letti da solo un thread
+    public synchronized int read(){ //Saranno letti da solo un thread
         return count;
     }
 }
