@@ -64,7 +64,7 @@ public class ThreadMaster extends Thread{
                                 else
                                     myView.setFinish(" Time to finish: " + (System.currentTimeMillis() - time) + "ms");
                             }
-                            else { // Only stop or off is possible (start button is still disable)
+                            else { // Only stop or off are possible (start button is still disable)
                                 pathsToReadList.reset();
                                 stateMain.readState();
                                 pathsToReadList.activate();
