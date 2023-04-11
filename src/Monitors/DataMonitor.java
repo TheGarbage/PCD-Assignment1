@@ -1,8 +1,8 @@
 package Monitors;
 
-import Monitors.SizeClassificationList.MultiSizeClassificationList;
-import Monitors.SizeClassificationList.SingleSizeClassificationList;
-import Monitors.SizeClassificationList.SizeClassificationListMonitor;
+import Monitors.SizeClassificationListMonitors.MultiSizeClassificationListMonitor;
+import Monitors.SizeClassificationListMonitors.SingleSizeClassificationListMonitor;
+import Monitors.SizeClassificationListMonitors.SizeClassificationListMonitor;
 import Utilities.StateEnum;
 import Utilities.ThreadConstants;
 
@@ -12,12 +12,12 @@ import java.util.Collections;
 public class DataMonitor {
     // Final Monitor
     final StateMonitor state = new StateMonitor();
-    final PathsToReadList pathsToReadList = new PathsToReadList(state);
+    final PathsToReadListMonitor pathsToReadListMonitor = new PathsToReadListMonitor(state);
     final StateMonitor listHasChanged = new StateMonitor();
     final StateMonitor countersHasChanged = new StateMonitor();
 
     // Variable Monitor
-    SizeClassificationListMonitor sizeClassificationList;
+    SizeClassificationListMonitor sizeClassificationListMonitor;
     CounterMonitor[] countersArray;
 
     // Parameters
@@ -32,9 +32,9 @@ public class DataMonitor {
     public synchronized void initialializzation(String d, int n, int maxl, int ni) throws InterruptedException {
         while(nReader > 0) wait();
         if(n == 1)
-            this.sizeClassificationList = new SingleSizeClassificationList();
+            this.sizeClassificationListMonitor = new SingleSizeClassificationListMonitor();
         else
-            this.sizeClassificationList = new MultiSizeClassificationList(n);
+            this.sizeClassificationListMonitor = new MultiSizeClassificationListMonitor(n);
         this.countersArray = new CounterMonitor[ni];
         for(int i = 0; i < ni; i++)
             countersArray[i] = new CounterMonitor();
@@ -84,7 +84,7 @@ public class DataMonitor {
         synchronized(this){
             nReader++;
         }
-        ArrayList<String> list = sizeClassificationList.read();
+        ArrayList<String> list = sizeClassificationListMonitor.read();
         synchronized(this){
             nReader--;
             notify();
@@ -106,7 +106,7 @@ public class DataMonitor {
 
     // No synchronized method
     public void aggiungiFile(String item, int lines) throws InterruptedException {
-        if(sizeClassificationList.put(item))
+        if(sizeClassificationListMonitor.put(item))
             listHasChanged.changeState(StateEnum.START);
         if (lines < this.maxl)
             this.countersArray[lines / (this.maxl / (this.ni - 1))].increment();
@@ -120,8 +120,8 @@ public class DataMonitor {
         return state;
     }
 
-    public PathsToReadList getFilesToReadList() {
-        return pathsToReadList;
+    public PathsToReadListMonitor getFilesToReadList() {
+        return pathsToReadListMonitor;
     }
 
     public StateMonitor getListHasChanged() {
@@ -138,6 +138,6 @@ public class DataMonitor {
     }
 
     public boolean sizeClassificationListIsEmpty() throws InterruptedException {
-        return sizeClassificationList.isEmpty();
+        return sizeClassificationListMonitor.isEmpty();
     }
 }

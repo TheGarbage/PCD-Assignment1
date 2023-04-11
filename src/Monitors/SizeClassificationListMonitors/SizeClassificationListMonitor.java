@@ -1,4 +1,4 @@
-package Monitors.SizeClassificationList;
+package Monitors.SizeClassificationListMonitors;
 
 import java.util.ArrayList;
 

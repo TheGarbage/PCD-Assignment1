@@ -8,10 +8,6 @@ public class CounterMonitor {
         count++;
     }
 
-    public synchronized int decrement(){
-        return --count;
-    }
-
     public synchronized int read(){ //Saranno letti da solo un thread
         return count;
     }

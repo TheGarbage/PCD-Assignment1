@@ -1,10 +1,10 @@
-package Monitors.SizeClassificationList;
+package Monitors.SizeClassificationListMonitors;
 
 import Utilities.ThreadConstants;
 
 import java.util.ArrayList;
 
-public class SingleSizeClassificationList implements SizeClassificationListMonitor{
+public class SingleSizeClassificationListMonitor implements SizeClassificationListMonitor{
     String maxSizeFile = ThreadConstants.STRING_PREFIX;
 
     @Override

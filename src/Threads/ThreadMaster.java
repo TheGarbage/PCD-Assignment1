@@ -17,7 +17,7 @@ public class ThreadMaster extends Thread{
     SizeCountersObeserver sizeCountersObeserver;
     View myView;
     final DataMonitor dataMonitor = new DataMonitor();
-    final PathsToReadList pathsToReadList;
+    final PathsToReadListMonitor pathsToReadListMonitor;
     final StateMonitor stateMain;
     final StateMonitor stateSizeCountersObserver;
     final StateMonitor stateRankingListObserver;
@@ -28,7 +28,7 @@ public class ThreadMaster extends Thread{
         this.threadArray = new ThreadSlave[nSlavesThread];
         for(int i = 0; i < threadArray.length; i++)
             threadArray[i] = new ThreadSlave(this.dataMonitor);
-        pathsToReadList = dataMonitor.getFilesToReadList();
+        pathsToReadListMonitor = dataMonitor.getFilesToReadList();
         stateMain = dataMonitor.getState();
         stateSizeCountersObserver = dataMonitor.getCountersHasChanged();
         stateRankingListObserver = dataMonitor.getListHasChanged();
@@ -55,7 +55,7 @@ public class ThreadMaster extends Thread{
                             myView.setFinish(" The selected directory is empty");
                         else {
                             myView.setProcessing();
-                            pathsToReadList.put(path); // Inizia il lavoro
+                            pathsToReadListMonitor.put(path); // Inizia il lavoro
                             stateEnum = stateMain.readState();
                             if (stateEnum == StateEnum.CONTINUE) {
                                 myView.disableStop();
@@ -65,9 +65,9 @@ public class ThreadMaster extends Thread{
                                     myView.setFinish(" Time to finish: " + (System.currentTimeMillis() - time) + "ms");
                             }
                             else { // Only stop or off are possible (start button is still disable)
-                                pathsToReadList.reset();
+                                pathsToReadListMonitor.reset();
                                 stateMain.readState();
-                                pathsToReadList.activate();
+                                pathsToReadListMonitor.activate();
                                 if (stateEnum == StateEnum.OFF)
                                     break;
                                 myView.setFinish(" Stopped");
@@ -80,7 +80,7 @@ public class ThreadMaster extends Thread{
                         break;
                 }
                 for(int i = 0; i < nSlavesThread; i++)
-                    pathsToReadList.put(ThreadConstants.TERMINATION_MESSAGE);
+                    pathsToReadListMonitor.put(ThreadConstants.TERMINATION_MESSAGE);
                 for (Thread t : threadArray)
                     t.join();
                 stateRankingListObserver.changeState(StateEnum.OFF);
