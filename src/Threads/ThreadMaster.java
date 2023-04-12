@@ -11,7 +11,7 @@ import Utilities.StateEnum;
 import java.io.File;
 
 public class ThreadMaster extends Thread{
-    final int nSlavesThread = Runtime.getRuntime().availableProcessors();
+    final int nSlavesThread = 2 * Runtime.getRuntime().availableProcessors();
     final ThreadSlave[] threadArray;
     RankingListObserver rankingListObserver;
     CountersObeserver countersObeserver;

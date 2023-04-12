@@ -7,8 +7,8 @@ import java.util.Collections;
 
 public class MainSequenziale {
 
-    static String d = "C:\\Users\\gugli\\OneDrive\\Università\\Magistrale\\Non_Date\\Programmazione concorrente\\PCD-Assignment1\\TestFolder2";
-    static int ni = 5;
+    static String d = "C:\\Users\\gugli\\Downloads\\TestFolder2";
+    static int ni = 6;
     static int n = 10;
     static int maxl = 100;
     static ArrayList<String> list = new ArrayList<>();
@@ -16,7 +16,7 @@ public class MainSequenziale {
     static final String cod = "0000000000";
     static final int max = 10;
 
-    private static void recursive(File file, String spazio){
+    private static void recursive(File file){
         if(file.getName().endsWith(".java")) {
 
             try {
@@ -34,26 +34,21 @@ public class MainSequenziale {
                     list.add(input);
                     Collections.sort(list);
                 }
-                if(lines < maxl)
-                    if(lines > maxl - (maxl / ni))
-                        nItem[ni - 2]++;
-                    else
-                        nItem[lines / (maxl / (ni - 1))]++;
+                if (lines < maxl)
+                    nItem[lines / (maxl / (ni - 1))]++;
                 else
                     nItem[ni - 1]++;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-        else if(file.listFiles() != null) {
-            spazio += " ";
-            for (File f : file.listFiles()) recursive(f, spazio);
-        }
+        else if(file.listFiles() != null)
+            for (File f : file.listFiles()) recursive(f);
     }
 
     public static void main(String[] args) {
         long time = System.currentTimeMillis();
-        recursive(new File(d), "");
+        recursive(new File(d));
         //Controllare che la lista non sia vuota
         for(int i = list.size() - 1; i >= list.size() - n; i--)
             System.out.println(list.size() - i + ")" +
@@ -63,10 +58,8 @@ public class MainSequenziale {
             );
         System.out.println(list.size());
         for(int i = 0; i < nItem.length; i++)
-            if(i != (ni - 1) && i != (ni-2))
-                System.out.println("range: " + (maxl/ni*i) + "-" + (maxl/ni*(i+1) - 1) + " = " + nItem[i]);
-            else if(i == (ni-2))
-                System.out.println("range: " + (maxl/ni*i) + "-" + (maxl - 1) + " = " + nItem[i]);
+            if(i != (ni - 1))
+                System.out.println("range: " + (maxl / (ni - 1) * i) + "-" + (maxl / (ni - 1) * (i + 1) - 1) + " = " + nItem[i]);
             else
                 System.out.println("range: " + maxl + "-... = " + nItem[i]);
         System.out.println(System.currentTimeMillis() - time);
