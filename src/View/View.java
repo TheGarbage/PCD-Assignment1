@@ -117,7 +117,7 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         stopButton.addActionListener(this);
 
         this.dataMonitor = dataMonitor;
-        this.stateThreadMaster = dataMonitor.getState();
+        this.stateThreadMaster = dataMonitor.getMasterstate();
     }
 
     @Override
@@ -136,7 +136,7 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         else if(e.getSource() == startButton){
             setIdle(false);
             try {
-                dataMonitor.initialializzation(fileChooser.getSelectedFile().getAbsolutePath(), (Integer)n.getValue(), (int) maxl.getValue(), (int) ni.getSelectedItem());
+                dataMonitor.initialializzation(fileChooser.getSelectedFile().getAbsolutePath(), (int)n.getValue(), (int) maxl.getValue(), (int) ni.getSelectedItem());
             } catch (InterruptedException ex) {
                 throw new RuntimeException(ex);
             }
@@ -161,33 +161,32 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
     }
 
     @Override
-    public void windowClosed(WindowEvent e) {
-    }
+    public void windowClosed(WindowEvent e) {}
 
     @Override
-    public void windowIconified(WindowEvent e) {
-    }
+    public void windowIconified(WindowEvent e) {}
 
     @Override
-    public void windowDeiconified(WindowEvent e) {
-    }
+    public void windowDeiconified(WindowEvent e) {}
 
     @Override
-    public void windowActivated(WindowEvent e) {
-    }
+    public void windowActivated(WindowEvent e) {}
 
     @Override
-    public void windowDeactivated(WindowEvent e) {
-    }
+    public void windowDeactivated(WindowEvent e) {}
 
     @Override
     public void stateChanged(ChangeEvent e) {
         if (e.getSource() == maxl) {
-            ni.removeAllItems();
-            if((int) maxl.getValue() == 2)
-                ni.addItem(3);
-            else
-                ni.addItem(2);
+            int niValue = (int) ni.getSelectedItem();
+            int maxlValue = (int) maxl.getValue();
+            if(maxlValue < (niValue - 1) || maxlValue % (niValue - 1) != 0) {
+                ni.removeAllItems();
+                if (maxlValue == 2)
+                    ni.addItem(3);
+                else
+                    ni.addItem(2);
+            }
         }
     }
 
@@ -237,6 +236,8 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
             } catch (ParseException ex) {
                 throw new RuntimeException(ex);
             }
+            int niValue = (int) ni.getSelectedItem();
+            ni.removeAllItems();
             int maxlValue = (int) maxl.getValue();
             if(maxlValue != 2) {
                 for (int i = 1; i < maxlValue; i++)
@@ -244,17 +245,16 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
                         ni.addItem(i + 1);
                 if (maxlValue < Integer.MAX_VALUE)
                     ni.addItem(maxlValue + 1);
+                ni.setSelectedItem(niValue);
             }
+            else
+                ni.addItem(3);
         }
     }
 
     @Override
-    public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-
-    }
+    public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {}
 
     @Override
-    public void popupMenuCanceled(PopupMenuEvent e) {
-
-    }
+    public void popupMenuCanceled(PopupMenuEvent e) {}
 }

@@ -1,4 +1,4 @@
-package Threads.Controller;
+package Threads.Observers;
 
 import Monitors.DataMonitor;
 import Monitors.StateMonitor;
@@ -13,7 +13,7 @@ public class RankingListObserver extends AbstractObserver{
 
     @Override
     StateMonitor getStateMonitor() {
-        return this.dataManster.getListHasChanged();
+        return this.dataManster.getRankingListObserverState();
     }
 
     @Override

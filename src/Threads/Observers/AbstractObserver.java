@@ -1,4 +1,4 @@
-package Threads.Controller;
+package Threads.Observers;
 
 import Monitors.DataMonitor;
 import Monitors.StateMonitor;

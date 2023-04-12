@@ -1,8 +1,8 @@
 package Monitors;
 
-import Monitors.SizeClassificationListMonitors.MultiSizeClassificationListMonitor;
-import Monitors.SizeClassificationListMonitors.SingleSizeClassificationListMonitor;
-import Monitors.SizeClassificationListMonitors.SizeClassificationListMonitor;
+import Monitors.RankingListMonitor.RankingListMonitor;
+import Monitors.RankingListMonitor.RankingStringMonitor;
+import Monitors.RankingListMonitor.RankingMonitor;
 import Utilities.StateEnum;
 import Utilities.ThreadConstants;
 
@@ -11,13 +11,13 @@ import java.util.Collections;
 
 public class DataMonitor {
     // Final Monitor
-    final StateMonitor state = new StateMonitor();
-    final PathsToReadListMonitor pathsToReadListMonitor = new PathsToReadListMonitor(state);
-    final StateMonitor listHasChanged = new StateMonitor();
-    final StateMonitor countersHasChanged = new StateMonitor();
+    final StateMonitor Masterstate = new StateMonitor();
+    final PathsToReadListMonitor pathsToReadListMonitor = new PathsToReadListMonitor(Masterstate);
+    final StateMonitor rankingListObserverState = new StateMonitor();
+    final StateMonitor countersObserverState = new StateMonitor();
 
     // Variable Monitor
-    SizeClassificationListMonitor sizeClassificationListMonitor;
+    RankingMonitor rankingMonitor;
     CounterMonitor[] countersArray;
 
     // Parameters
@@ -32,9 +32,9 @@ public class DataMonitor {
     public synchronized void initialializzation(String d, int n, int maxl, int ni) throws InterruptedException {
         while(nReader > 0) wait();
         if(n == 1)
-            this.sizeClassificationListMonitor = new SingleSizeClassificationListMonitor();
+            this.rankingMonitor = new RankingStringMonitor();
         else
-            this.sizeClassificationListMonitor = new MultiSizeClassificationListMonitor(n);
+            this.rankingMonitor = new RankingListMonitor(n);
         this.countersArray = new CounterMonitor[ni];
         for(int i = 0; i < ni; i++)
             countersArray[i] = new CounterMonitor();
@@ -42,7 +42,7 @@ public class DataMonitor {
         this.n = n;
         this.maxl = maxl;
         this.ni = ni;
-        this.state.changeState(StateEnum.START);
+        this.Masterstate.changeState(StateEnum.START);
     }
 
     public String creaStringCounters(){
@@ -84,7 +84,7 @@ public class DataMonitor {
         synchronized(this){
             nReader++;
         }
-        ArrayList<String> list = sizeClassificationListMonitor.read();
+        ArrayList<String> list = rankingMonitor.read();
         synchronized(this){
             nReader--;
             notify();
@@ -106,30 +106,30 @@ public class DataMonitor {
 
     // No synchronized method
     public void aggiungiFile(String item, int lines) throws InterruptedException {
-        if(sizeClassificationListMonitor.put(item))
-            listHasChanged.changeState(StateEnum.START);
+        if(rankingMonitor.put(item))
+            rankingListObserverState.changeState(StateEnum.START);
         if (lines < this.maxl)
             this.countersArray[lines / (this.maxl / (this.ni - 1))].increment();
         else
             this.countersArray[this.ni - 1].increment();
-        countersHasChanged.changeState(StateEnum.START);
+        countersObserverState.changeState(StateEnum.START);
     }
 
     // Constant getter
-    public StateMonitor getState() {
-        return state;
+    public StateMonitor getMasterstate() {
+        return Masterstate;
     }
 
     public PathsToReadListMonitor getFilesToReadList() {
         return pathsToReadListMonitor;
     }
 
-    public StateMonitor getListHasChanged() {
-        return listHasChanged;
+    public StateMonitor getRankingListObserverState() {
+        return rankingListObserverState;
     }
 
-    public StateMonitor getCountersHasChanged() {
-        return countersHasChanged;
+    public StateMonitor getCountersObserverState() {
+        return countersObserverState;
     }
 
     // Variable getter
@@ -138,6 +138,6 @@ public class DataMonitor {
     }
 
     public boolean sizeClassificationListIsEmpty() throws InterruptedException {
-        return sizeClassificationListMonitor.isEmpty();
+        return rankingMonitor.isEmpty();
     }
 }

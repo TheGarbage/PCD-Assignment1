@@ -2,8 +2,8 @@ package Threads;
 
 import Monitors.DataMonitor;
 import Monitors.*;
-import Threads.Controller.SizeCountersObeserver;
-import Threads.Controller.RankingListObserver;
+import Threads.Observers.CountersObeserver;
+import Threads.Observers.RankingListObserver;
 import Utilities.ThreadConstants;
 import View.View;
 import Utilities.StateEnum;
@@ -14,13 +14,13 @@ public class ThreadMaster extends Thread{
     final int nSlavesThread = Runtime.getRuntime().availableProcessors();
     final ThreadSlave[] threadArray;
     RankingListObserver rankingListObserver;
-    SizeCountersObeserver sizeCountersObeserver;
+    CountersObeserver countersObeserver;
     View myView;
     final DataMonitor dataMonitor = new DataMonitor();
     final PathsToReadListMonitor pathsToReadListMonitor;
     final StateMonitor stateMain;
-    final StateMonitor stateSizeCountersObserver;
-    final StateMonitor stateRankingListObserver;
+    final StateMonitor countersObserverState;
+    final StateMonitor rankingListObserverState;
 
 
     public ThreadMaster(){
@@ -29,9 +29,9 @@ public class ThreadMaster extends Thread{
         for(int i = 0; i < threadArray.length; i++)
             threadArray[i] = new ThreadSlave(this.dataMonitor);
         pathsToReadListMonitor = dataMonitor.getFilesToReadList();
-        stateMain = dataMonitor.getState();
-        stateSizeCountersObserver = dataMonitor.getCountersHasChanged();
-        stateRankingListObserver = dataMonitor.getListHasChanged();
+        stateMain = dataMonitor.getMasterstate();
+        countersObserverState = dataMonitor.getCountersObserverState();
+        rankingListObserverState = dataMonitor.getRankingListObserverState();
         this.start();
     }
 
@@ -41,7 +41,7 @@ public class ThreadMaster extends Thread{
                 this.myView = new View(dataMonitor);
                 this.myView.openWindow();
                 rankingListObserver = new RankingListObserver(myView, dataMonitor);
-                sizeCountersObeserver = new SizeCountersObeserver(myView, dataMonitor);
+                countersObeserver = new CountersObeserver(myView, dataMonitor);
                 StateEnum stateEnum;
                 while(true) {
                     stateEnum = stateMain.readState();
@@ -83,10 +83,10 @@ public class ThreadMaster extends Thread{
                     pathsToReadListMonitor.put(ThreadConstants.TERMINATION_MESSAGE);
                 for (Thread t : threadArray)
                     t.join();
-                stateRankingListObserver.changeState(StateEnum.OFF);
+                rankingListObserverState.changeState(StateEnum.OFF);
                 rankingListObserver.join();
-                stateSizeCountersObserver.changeState(StateEnum.OFF);
-                sizeCountersObeserver.join();
+                countersObserverState.changeState(StateEnum.OFF);
+                countersObeserver.join();
                 System.out.println("All threads terminated");
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
