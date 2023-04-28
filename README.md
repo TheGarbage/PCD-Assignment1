@@ -1,4 +1,4 @@
-# PCD-Assignment1
+# PCD-Assignment2
 				
 L’assignment consiste nell'affrontare il problema illustrato nel primo assignment utilizzando le tecniche di programmazione asincrona viste nel corso. In particolare:
 
