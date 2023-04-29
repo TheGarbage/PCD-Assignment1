@@ -9,8 +9,6 @@ import Assignment2.Common.Monitors.RankingListMonitor.RankingStringMonitor;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class DataMonitor {
     // Final Monitor
@@ -94,7 +92,7 @@ public class DataMonitor {
         return text;
     }
 
-    public void addFile(String item, int lines) throws InterruptedException {
+    public void addFile(String item, int lines){
         if(rankingMonitor.put(item))
             rankingListObserverState.changeState(StateEnum.START);
         if (lines < this.maxl)

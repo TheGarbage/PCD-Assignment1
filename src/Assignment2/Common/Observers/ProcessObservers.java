@@ -17,7 +17,7 @@ public class ProcessObservers extends AbstractObserver{
     }
 
     @Override
-    void updateMyView() throws InterruptedException, InvocationTargetException {
+    void updateMyView(){
         myView.setFinish(this.dataManster.getFinalMessage());
     }
 }
