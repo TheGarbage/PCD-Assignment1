@@ -1,42 +1,50 @@
 package Assignment2.VirtualThreads;
 
+import Assignment2.Common.Interface.SourceAnalyser;
 import Assignment2.Common.Utilities.ThreadConstants;
 import Assignment2.Common.Monitors.DataMonitor;
-import Assignment2.Common.Monitors.StateMonitor;
 
 import java.io.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
-public class VirtualThread {
+public class VirtualThread  implements SourceAnalyser {
     final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
-    final DataMonitor dataMonitor = new DataMonitor();
-    final StateMonitor processState;
-    final StateMonitor countersObserverState;
-    final StateMonitor rankingListObserverState;
-    final DataMonitor dataManster;
-    long startTime;
+    DataMonitor dataMonitor;
 
+    public DataMonitor analyzeSources(String d, int n, int maxl, int ni){
+        dataMonitor = new DataMonitor(d, n, maxl, ni, this::stop);
+        Thread.ofVirtual().start(() -> {
+            Long startTime = System.currentTimeMillis();
+            String finalMessage = "Error";
+            String path = dataMonitor.getD();
+            File[] directoryFiles = (new File(path).listFiles());
+            if (directoryFiles == null)
+                finalMessage = " Invalid directory Selected";
+            else if (directoryFiles.length == 0)
+                finalMessage = " The selected directory is empty";
+            else {
+                executor.submit(() -> directoryReader(path));
+            }
+            try{
+                if(executor.awaitTermination(10, TimeUnit.MINUTES))
+                    if(executor.isTerminated())
+                        finalMessage = " Stopped";
+                    else if (dataMonitor.sizeClassificationListIsEmpty())
+                        finalMessage = " No java files in the directory";
+                    else
+                        finalMessage = " Time to finish: " + (System.currentTimeMillis() - startTime) + "ms";
+                else
+                    finalMessage = " Max execution time (10 minutes) reached";
 
-    public VirtualThread(){
-        processState = dataMonitor.getProcesState();
-        countersObserverState = dataMonitor.getCountersObserverState();
-        rankingListObserverState = dataMonitor.getRankingListObserverState();
-        dataManster = new DataMonitor();
-    }
-
-    public void start(){
-        startTime = System.currentTimeMillis();
-        String path = dataMonitor.getD();
-        File[] directoryFiles = (new File(path).listFiles());
-        if (directoryFiles == null);
-            // Invalid directory Selected
-        else if(directoryFiles.length == 0);
-            // The selected directory is empty
-        else {
-            executor.submit(() -> directoryReader(path));
-        }
-        executor.isTerminated();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            } finally {
+                dataMonitor.setFinalMessage(finalMessage);
+            }
+        });
+        return dataMonitor;
     }
 
     public void stop(){
@@ -49,7 +57,7 @@ public class VirtualThread {
         while (reader.readLine() != null) lines++;
         reader.close();
         String item = ThreadConstants.STRING_PREFIX.substring(0, ThreadConstants.MAX_DIGITS - String.valueOf(lines).length()) + lines + String.valueOf(lines).length() + (new File(path)).getName();
-        dataManster.addFile(item, lines);
+        dataMonitor.addFile(item, lines);
     }
 
     public void directoryReader(String path){

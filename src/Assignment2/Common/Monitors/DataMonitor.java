@@ -1,5 +1,6 @@
 package Assignment2.Common.Monitors;
 
+import Assignment2.Common.Interface.Stoppable;
 import Assignment2.Common.Utilities.StateEnum;
 import Assignment2.Common.Utilities.ThreadConstants;
 import Assignment2.Common.Monitors.RankingListMonitor.RankingListMonitor;
@@ -13,9 +14,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class DataMonitor {
     // Final Monitor
-    final StateMonitor procesState = new StateMonitor();
     final StateMonitor rankingListObserverState = new StateMonitor();
     final StateMonitor countersObserverState = new StateMonitor();
+    final StateMonitor processObserverState = new StateMonitor();
 
     // Variable Monitor
     RankingMonitor rankingMonitor;
@@ -27,50 +28,32 @@ public class DataMonitor {
     int ni;
     String d;
 
-    // Writers-Readers
-    int nReader = 0;
-    final ReentrantLock lock = new ReentrantLock();
-    final Condition readingCondition = lock.newCondition();
+    // Final message
+    String finalMessage;
 
-    public void initialializzation(String d, int n, int maxl, int ni) throws InterruptedException {
-        try {
-            lock.lock();
-            while (nReader > 0) readingCondition.await();
-            if (n == 1)
-                this.rankingMonitor = new RankingStringMonitor();
-            else
-                this.rankingMonitor = new RankingListMonitor(n);
-            this.countersArray = new CounterMonitor[ni];
-            for (int i = 0; i < ni; i++)
-                countersArray[i] = new CounterMonitor();
-            this.d = d;
-            this.n = n;
-            this.maxl = maxl;
-            this.ni = ni;
-            this.procesState.changeState(StateEnum.START);
-        } finally {
-            lock.unlock();
-        }
+    //Stoppable
+    Stoppable stoppable;
+
+    public DataMonitor(String d, int n, int maxl, int ni, Stoppable stoppable){
+        if (n == 1)
+            this.rankingMonitor = new RankingStringMonitor();
+        else
+            this.rankingMonitor = new RankingListMonitor(n);
+        this.countersArray = new CounterMonitor[ni];
+        for (int i = 0; i < ni; i++)
+            countersArray[i] = new CounterMonitor();
+        this.d = d;
+        this.n = n;
+        this.maxl = maxl;
+        this.ni = ni;
+        this.stoppable = stoppable;
     }
 
     public String makeStringCounters(){
         int i;
         ArrayList<Integer> countersList = new ArrayList<>();
-        try{
-            lock.lock();
-            nReader++;
-        } finally {
-            lock.unlock();
-        }
         for (i = 0; i < ni; i++)
             countersList.add(countersArray[i].read());
-        try{
-            lock.lock();
-            nReader--;
-            readingCondition.notify();
-        } finally {
-            lock.unlock();
-        }
         String text = "";
         if(ni < maxl) {
             for (i = 0; i < ni; i++) {
@@ -95,20 +78,7 @@ public class DataMonitor {
     }
 
     public String makeStringList() throws InterruptedException {
-        try{
-            lock.lock();
-            nReader++;
-        } finally {
-            lock.unlock();
-        }
         ArrayList<String> list = rankingMonitor.read();
-        try{
-            lock.lock();
-            nReader--;
-            readingCondition.notify();
-        } finally {
-            lock.unlock();
-        }
         String item, text = "";
         if(list.size() < n && list.size() != 1)
             Collections.sort(list);
@@ -124,7 +94,6 @@ public class DataMonitor {
         return text;
     }
 
-    // No synchronized method
     public void addFile(String item, int lines) throws InterruptedException {
         if(rankingMonitor.put(item))
             rankingListObserverState.changeState(StateEnum.START);
@@ -136,16 +105,15 @@ public class DataMonitor {
     }
 
     // Constant getter
-    public StateMonitor getProcesState() {
-        return procesState;
-    }
-
     public StateMonitor getRankingListObserverState() {
         return rankingListObserverState;
     }
 
     public StateMonitor getCountersObserverState() {
         return countersObserverState;
+    }
+    public StateMonitor getProcessObserverState() {
+        return processObserverState;
     }
 
     // Variable getter
@@ -155,5 +123,19 @@ public class DataMonitor {
 
     public boolean sizeClassificationListIsEmpty() throws InterruptedException {
         return rankingMonitor.isEmpty();
+    }
+
+    public void stop(){
+        stoppable.shoutdown();
+    }
+
+    //Final message
+    public String getFinalMessage() {
+        return finalMessage;
+    }
+
+    public void setFinalMessage(String finalMessage) {
+        this.finalMessage = finalMessage;
+        processObserverState.changeState(StateEnum.START);
     }
 }

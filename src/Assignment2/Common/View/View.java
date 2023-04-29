@@ -1,7 +1,10 @@
 package Assignment2.Common.View;
 
+import Assignment2.Common.Interface.SourceAnalyser;
 import Assignment2.Common.Monitors.DataMonitor;
-import Assignment2.Common.Monitors.StateMonitor;
+import Assignment2.Common.Observers.CountersObeserver;
+import Assignment2.Common.Observers.ProcessObservers;
+import Assignment2.Common.Observers.RankingListObserver;
 import Assignment2.Common.Utilities.StateEnum;
 
 import javax.swing.*;
@@ -19,6 +22,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 
 public class View extends JFrame implements ActionListener, WindowListener, ChangeListener, PopupMenuListener {
+    // Text utilities
     final String rankingTitle = "-------------------   RANKING -------------------";
     final String intervalsTitle = "----------   INTERVALS DIVISION   ----------";
     final int maxSizePath = 45;
@@ -36,10 +40,15 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
     JButton startButton = new JButton("   Start   ");
     JButton stopButton = new JButton("   Stop   ");
     JFileChooser fileChooser = new JFileChooser("/");
-    final DataMonitor dataMonitor;
-    final StateMonitor stateThreadMaster;
 
-    public View(DataMonitor dataMonitor) {
+    // Constant
+    final SourceAnalyser sourceAnalyser;
+    DataMonitor dataMonitor;
+    ProcessObservers processObservers;
+    CountersObeserver countersObeserver;
+    RankingListObserver rankingListObserver;
+
+    public View(SourceAnalyser sourceAnalyser) {
         super("PCD-Assignment1");
         setSize(600, 600);
         JPanel parametersPanel = new JPanel();
@@ -119,8 +128,8 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         startButton.addActionListener(this);
         stopButton.addActionListener(this);
 
-        this.dataMonitor = dataMonitor;
-        this.stateThreadMaster = dataMonitor.getProcesState();
+        this.sourceAnalyser = sourceAnalyser;
+        this.setVisible(true);
     }
 
     @Override
@@ -139,15 +148,18 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         else if(e.getSource() == startButton){
             setIdle(false);
             try {
-                dataMonitor.initialializzation(fileChooser.getSelectedFile().getAbsolutePath(), (int)n.getValue(), (int) maxl.getValue(), (int) ni.getSelectedItem());
+                this.dataMonitor = sourceAnalyser.analyzeSources(fileChooser.getSelectedFile().getAbsolutePath(), (int)n.getValue(), (int) maxl.getValue(), (int) ni.getSelectedItem());
+                this.processObservers = new ProcessObservers(this, this.dataMonitor);
+                this.countersObeserver = new CountersObeserver(this, this.dataMonitor);
+                this.rankingListObserver = new RankingListObserver(this, this.dataMonitor);
             } catch (InterruptedException ex) {
                 throw new RuntimeException(ex);
             }
-            processState.setText(" Initializzation...");
+            processState.setText(" Processing...");
         }
         else if(e.getSource() == stopButton){
             stopButton.setEnabled(false);
-            stateThreadMaster.changeState(StateEnum.STOP);
+            this.dataMonitor.stop();
             processState.setText(" Stopping...");
         }
     }
@@ -158,7 +170,12 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
 
     @Override
     public void windowClosing(WindowEvent e) {
-        stateThreadMaster.changeState(StateEnum.OFF);
+        if(dataMonitor != null) {
+            dataMonitor.stop();
+            dataMonitor.getProcessObserverState().changeState(StateEnum.STOP);
+            dataMonitor.getCountersObserverState().changeState(StateEnum.STOP);
+            dataMonitor.getRankingListObserverState().changeState(StateEnum.STOP);
+        }
         dispose();
         System.exit(0);
     }
@@ -201,13 +218,6 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         startButton.setEnabled(enable);
     }
 
-    public void setProcessing(){
-        SwingUtilities.invokeLater(() -> {
-            stopButton.setEnabled(true);
-            processState.setText(" Processing...");
-        });
-    }
-
     public void setFinish(String text){
         SwingUtilities.invokeLater(() -> {
             setIdle(true);
@@ -215,9 +225,6 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         });
     }
 
-    public void disableStop(){
-        SwingUtilities.invokeLater(() -> stopButton.setEnabled(false));
-    }
 
     public void setRankingText(String text) throws InterruptedException, InvocationTargetException {
         SwingUtilities.invokeAndWait(() -> rankingText.setText(rankingTitle + "\n\n" + text));
@@ -225,10 +232,6 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
 
     public void setIntervalsText(String text) throws InterruptedException, InvocationTargetException {
         SwingUtilities.invokeAndWait(() -> intervalsText.setText(intervalsTitle + "\n\n" + text));
-    }
-
-    public void openWindow(){
-        SwingUtilities.invokeLater(() -> this.setVisible(true));
     }
 
     @Override
