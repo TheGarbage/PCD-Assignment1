@@ -1,8 +1,8 @@
 package Assignment2.Common.View;
 
-import Assignment1.Monitors.DataMonitor;
-import Assignment1.Monitors.StateMonitor;
-import Assignment1.Utilities.StateEnum;
+import Assignment2.Common.Monitors.DataMonitor;
+import Assignment2.Common.Monitors.StateMonitor;
+import Assignment2.Common.Utilities.StateEnum;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -120,7 +120,7 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         stopButton.addActionListener(this);
 
         this.dataMonitor = dataMonitor;
-        this.stateThreadMaster = dataMonitor.getMasterstate();
+        this.stateThreadMaster = dataMonitor.getProcesState();
     }
 
     @Override
