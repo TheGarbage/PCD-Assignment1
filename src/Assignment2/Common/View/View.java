@@ -29,7 +29,7 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
 
     JSpinner n = new JSpinner(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
     JSpinner maxl = new JSpinner(new SpinnerNumberModel(2, 2, Integer.MAX_VALUE, 1));
-    JComboBox<Integer> ni = new JComboBox<Integer>();
+    JComboBox<Integer> ni = new JComboBox<>();
     JTextArea processState = new JTextArea();
     JTextArea directorySelected = new JTextArea(" No directory selected");
     JButton directoryButton = new JButton("   Select Direcotory   ");

@@ -1,7 +1,6 @@
 package Assignment2.Common.Observers;
 
 import Assignment2.Common.Interface.DataWrapper;
-import Assignment2.Common.Monitors.DataMonitor;
 import Assignment2.Common.Monitors.StateMonitor;
 import Assignment2.Common.Utilities.StateEnum;
 import Assignment2.Common.Utilities.ThreadConstants;
