@@ -1,5 +1,6 @@
 package Assignment2.Common.Monitors;
 
+import Assignment2.Common.Interface.DataWrapper;
 import Assignment2.Common.Interface.Stoppable;
 import Assignment2.Common.Utilities.StateEnum;
 import Assignment2.Common.Utilities.ThreadConstants;
@@ -10,7 +11,7 @@ import Assignment2.Common.Monitors.RankingListMonitor.RankingStringMonitor;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class DataMonitor {
+public class DataMonitor implements DataWrapper {
     // Final Monitor
     final StateMonitor rankingListObserverState = new StateMonitor();
     final StateMonitor countersObserverState = new StateMonitor();
@@ -47,6 +48,7 @@ public class DataMonitor {
         this.stoppable = stoppable;
     }
 
+    @Override
     public String makeStringCounters(){
         int i;
         ArrayList<Integer> countersList = new ArrayList<>();
@@ -75,6 +77,7 @@ public class DataMonitor {
         return text;
     }
 
+    @Override
     public String makeStringList() throws InterruptedException {
         ArrayList<String> list = rankingMonitor.read();
         String item, text = "";
@@ -103,13 +106,15 @@ public class DataMonitor {
     }
 
     // Constant getter
+    @Override
     public StateMonitor getRankingListObserverState() {
         return rankingListObserverState;
     }
-
+    @Override
     public StateMonitor getCountersObserverState() {
         return countersObserverState;
     }
+    @Override
     public StateMonitor getProcessObserverState() {
         return processObserverState;
     }
@@ -123,11 +128,14 @@ public class DataMonitor {
         return rankingMonitor.isEmpty();
     }
 
+    // Stop
+    @Override
     public void stop(){
         stoppable.shoutdown();
     }
 
     //Final message
+    @Override
     public String getFinalMessage() {
         return finalMessage;
     }

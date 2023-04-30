@@ -5,6 +5,8 @@ import Assignment2.Common.Utilities.StateEnum;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static Assignment2.Common.Utilities.StateEnum.STOP;
+
 public class StateMonitor {
     private StateEnum stateEnum = StateEnum.WAIT;
     final ReentrantLock lock = new ReentrantLock();
@@ -13,8 +15,9 @@ public class StateMonitor {
     public void changeState(StateEnum stateEnum){
         try {
             lock.lock();
-            this.stateEnum = stateEnum;
-            waitCodition.notify();
+            if(this.stateEnum != STOP && this.stateEnum != stateEnum)
+                this.stateEnum = stateEnum;
+            waitCodition.signal();
         } finally {
             lock.unlock();
         }

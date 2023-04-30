@@ -1,7 +1,7 @@
 package Assignment2.Common.View;
 
+import Assignment2.Common.Interface.DataWrapper;
 import Assignment2.Common.Interface.SourceAnalyser;
-import Assignment2.Common.Monitors.DataMonitor;
 import Assignment2.Common.Observers.CountersObeserver;
 import Assignment2.Common.Observers.ProcessObservers;
 import Assignment2.Common.Observers.RankingListObserver;
@@ -43,7 +43,7 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
 
     // Constant
     final SourceAnalyser sourceAnalyser;
-    DataMonitor dataMonitor;
+    DataWrapper dataWrapper;
     ProcessObservers processObservers;
     CountersObeserver countersObeserver;
     RankingListObserver rankingListObserver;
@@ -147,20 +147,16 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         }
         else if(e.getSource() == startButton){
             setIdle(false);
-            try {
-                this.dataMonitor = sourceAnalyser.analyzeSources(fileChooser.getSelectedFile().getAbsolutePath(), (int)n.getValue(), (int) maxl.getValue(), (int) ni.getSelectedItem());
-                this.processObservers = new ProcessObservers(this, this.dataMonitor);
-                this.countersObeserver = new CountersObeserver(this, this.dataMonitor);
-                this.rankingListObserver = new RankingListObserver(this, this.dataMonitor);
-            } catch (InterruptedException ex) {
-                throw new RuntimeException(ex);
-            }
+            this.dataWrapper = sourceAnalyser.analyzeSources(fileChooser.getSelectedFile().getAbsolutePath(), (int)n.getValue(), (int) maxl.getValue(), (int) ni.getSelectedItem());
+            this.processObservers = new ProcessObservers(this, this.dataWrapper);
+            this.countersObeserver = new CountersObeserver(this, this.dataWrapper);
+            this.rankingListObserver = new RankingListObserver(this, this.dataWrapper);
             processState.setText(" Processing...");
         }
         else if(e.getSource() == stopButton){
-            stopButton.setEnabled(false);
-            this.dataMonitor.stop();
-            processState.setText(" Stopping...");
+            stopSourceAnalyser();
+            processState.setText(" Stopped");
+            setIdle(true);
         }
     }
 
@@ -170,14 +166,17 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
 
     @Override
     public void windowClosing(WindowEvent e) {
-        if(dataMonitor != null) {
-            dataMonitor.stop();
-            dataMonitor.getProcessObserverState().changeState(StateEnum.STOP);
-            dataMonitor.getCountersObserverState().changeState(StateEnum.STOP);
-            dataMonitor.getRankingListObserverState().changeState(StateEnum.STOP);
-        }
+        if(dataWrapper != null)
+            stopSourceAnalyser();
         dispose();
         System.exit(0);
+    }
+
+    private void stopSourceAnalyser(){
+        dataWrapper.stop();
+        dataWrapper.getProcessObserverState().changeState(StateEnum.STOP);
+        dataWrapper.getCountersObserverState().changeState(StateEnum.STOP);
+        dataWrapper.getRankingListObserverState().changeState(StateEnum.STOP);
     }
 
     @Override
@@ -216,6 +215,7 @@ public class View extends JFrame implements ActionListener, WindowListener, Chan
         maxl.setEnabled(enable);
         directoryButton.setEnabled(enable);
         startButton.setEnabled(enable);
+        stopButton.setEnabled(!enable);
     }
 
     public void setFinish(String text){

@@ -1,13 +1,11 @@
 package Assignment2.Common.Observers;
 
-import Assignment2.Common.Monitors.DataMonitor;
+import Assignment2.Common.Interface.DataWrapper;
 import Assignment2.Common.Monitors.StateMonitor;
 import Assignment2.Common.View.View;
 
-import java.lang.reflect.InvocationTargetException;
-
 public class ProcessObservers extends AbstractObserver{
-    public ProcessObservers(View myView, DataMonitor dataMonitor){
+    public ProcessObservers(View myView, DataWrapper dataMonitor){
         super(myView, dataMonitor);
     }
 

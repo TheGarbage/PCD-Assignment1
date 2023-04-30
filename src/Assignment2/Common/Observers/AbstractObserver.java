@@ -1,5 +1,6 @@
 package Assignment2.Common.Observers;
 
+import Assignment2.Common.Interface.DataWrapper;
 import Assignment2.Common.Monitors.DataMonitor;
 import Assignment2.Common.Monitors.StateMonitor;
 import Assignment2.Common.Utilities.StateEnum;
@@ -8,40 +9,41 @@ import Assignment2.Common.View.View;
 
 import java.lang.reflect.InvocationTargetException;
 
-public abstract class AbstractObserver extends Thread{
+public abstract class AbstractObserver{
     final long targetTimeDifference = 1000 / ThreadConstants.timeForSecondsGuiUpdate;
     final StateMonitor stateMonitor;
     final View myView;
-    final DataMonitor dataManster;
+    final DataWrapper dataManster;
 
-    public AbstractObserver(View myView, DataMonitor dataManster){
+    public AbstractObserver(View myView, DataWrapper dataManster){
         this.myView = myView;
         this.dataManster = dataManster;
         this.stateMonitor = getStateMonitor();
-        this.start();
+        run();
     }
 
-    @Override
     public void run() {
-        while(true) {
-            long startTime = System.currentTimeMillis();
-            try {
-                if(stateMonitor.readState() == StateEnum.START)
-                    updateMyView();
-                else
-                    return;
-            } catch (InterruptedException | InvocationTargetException e) {
-                throw new RuntimeException(e);
-            }
-            long timeDifference = System.currentTimeMillis() - startTime;
-            if (timeDifference < targetTimeDifference) {
+        Thread.ofVirtual().start(() -> {
+            while (true) {
+                long startTime = System.currentTimeMillis();
                 try {
-                    sleep(targetTimeDifference - timeDifference);
-                } catch (InterruptedException e) {
+                    if (stateMonitor.readState() == StateEnum.START)
+                        updateMyView();
+                    else
+                        return;
+                } catch (InterruptedException | InvocationTargetException e) {
                     throw new RuntimeException(e);
                 }
+                long timeDifference = System.currentTimeMillis() - startTime;
+                if (timeDifference < targetTimeDifference) {
+                    try {
+                        Thread.sleep(targetTimeDifference - timeDifference);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
             }
-        }
+        });
     }
 
     abstract StateMonitor getStateMonitor();
