@@ -1,6 +1,5 @@
 import Assignment2.Common.View.View;
 import Assignment2.Executor.ForkJoin.ForkJoinSourceAnalyser;
-import Assignment2.Executor.VirtualThreads.VirtualThreadSourceAnalyser;
 
 public class MainForkJoin {
     static String d = "/home/thegarbage/Scaricati";
