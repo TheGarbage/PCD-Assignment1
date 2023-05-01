@@ -1,20 +1,25 @@
-package Assignment2.VirtualThreads;
+package Assignment2.Executor;
 
 import Assignment2.Common.Interface.DataWrapper;
 import Assignment2.Common.Interface.SourceAnalyser;
-import Assignment2.Common.Utilities.ThreadConstants;
 import Assignment2.Common.Monitors.DataMonitor;
+import Assignment2.Common.Utilities.ThreadConstants;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
-public class VirtualThreadSourceAnalyser implements SourceAnalyser {
+public abstract class ExecutorSourceAnalyser implements SourceAnalyser {
     ExecutorService executor;
     DataMonitor dataMonitor;
 
     public Thread start(String d, int n, int maxl, int ni){
-        executor = Executors.newVirtualThreadPerTaskExecutor();
+        executor = getExecutor();
         dataMonitor = new DataMonitor(d, n, maxl, ni, this::stop);
         return Thread.ofVirtual().start(() -> {
             long startTime = System.currentTimeMillis();
@@ -92,4 +97,6 @@ public class VirtualThreadSourceAnalyser implements SourceAnalyser {
         start(d, n, maxl, ni);
         return dataMonitor;
     }
+
+    public abstract ExecutorService getExecutor();
 }

@@ -105,6 +105,11 @@ public class DataMonitor implements DataWrapper {
         countersObserverState.changeState(StateEnum.START);
     }
 
+    public void setFinalMessage(String finalMessage) {
+        this.finalMessage = finalMessage;
+        processObserverState.changeState(StateEnum.START);
+    }
+
     // Constant getter
     @Override
     public StateMonitor getRankingListObserverState() {
@@ -127,21 +132,14 @@ public class DataMonitor implements DataWrapper {
     public boolean sizeClassificationListIsEmpty() throws InterruptedException {
         return rankingMonitor.isEmpty();
     }
-
-    // Stop
-    @Override
-    public void stop(){
-        stoppable.shoutdown();
-    }
-
-    //Final message
     @Override
     public String getFinalMessage() {
         return finalMessage;
     }
 
-    public void setFinalMessage(String finalMessage) {
-        this.finalMessage = finalMessage;
-        processObserverState.changeState(StateEnum.START);
+    // Stop
+    @Override
+    public void stop(){
+        stoppable.shoutdown();
     }
 }
