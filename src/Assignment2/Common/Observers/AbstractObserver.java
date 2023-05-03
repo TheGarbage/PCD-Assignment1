@@ -8,7 +8,7 @@ import Assignment2.Common.View.View;
 
 import java.lang.reflect.InvocationTargetException;
 
-public abstract class AbstractObserver{
+public abstract class AbstractObserver extends Thread{
     final long targetTimeDifference = 1000 / ThreadConstants.timeForSecondsGuiUpdate;
     final StateMonitor stateMonitor;
     final View myView;
@@ -18,31 +18,29 @@ public abstract class AbstractObserver{
         this.myView = myView;
         this.dataManster = dataManster;
         this.stateMonitor = getStateMonitor();
-        run();
+        start();
     }
 
     public void run() {
-        Thread.ofVirtual().start(() -> {
-            while (true) {
-                long startTime = System.currentTimeMillis();
+        while (true) {
+            long startTime = System.currentTimeMillis();
+            try {
+                if (stateMonitor.readState() == StateEnum.START)
+                    updateMyView();
+                else
+                    return;
+            } catch (InterruptedException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+            long timeDifference = System.currentTimeMillis() - startTime;
+            if (timeDifference < targetTimeDifference) {
                 try {
-                    if (stateMonitor.readState() == StateEnum.START)
-                        updateMyView();
-                    else
-                        return;
-                } catch (InterruptedException | InvocationTargetException e) {
+                    Thread.sleep(targetTimeDifference - timeDifference);
+                } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-                long timeDifference = System.currentTimeMillis() - startTime;
-                if (timeDifference < targetTimeDifference) {
-                    try {
-                        Thread.sleep(targetTimeDifference - timeDifference);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
             }
-        });
+        }
     }
 
     abstract StateMonitor getStateMonitor();

@@ -10,9 +10,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 public abstract class ExecutorSourceAnalyser implements SourceAnalyser {
     ExecutorService executor;
@@ -61,27 +59,25 @@ public abstract class ExecutorSourceAnalyser implements SourceAnalyser {
     }
 
     public void directoryReader(String path){
-        File file = new File(path);
-        ArrayList<Future> futures = new ArrayList<>();
-        for (File f : file.listFiles()) {
-            if (f.getName().endsWith(".java"))
-                futures.add(executor.submit(() -> {
-                    try {
-                        linesCounter(f.getPath());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }));
-            else if (f.listFiles() != null && f.listFiles().length > 0)
-                futures.add(executor.submit(() -> directoryReader(f.getPath())));
-        }
-        for(Future future : futures) {
-            try {
+        try{
+            File file = new File(path);
+            ArrayList<Future> futures = new ArrayList<>();
+            for (File f : file.listFiles())
+                if (f.getName().endsWith(".java"))
+                    futures.add(executor.submit(() -> {
+                        try {
+                            linesCounter(f.getPath());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }));
+                else if (f.listFiles() != null && f.listFiles().length > 0)
+                    futures.add(executor.submit(() -> directoryReader(f.getPath())));
+            for(Future future : futures)
                 future.get();
-            } catch (ExecutionException e) {
-                throw new RuntimeException(e);
-            }catch (InterruptedException ignored){}
-        }
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }catch (InterruptedException | RejectedExecutionException | CancellationException ignored){}
     }
 
     @Override

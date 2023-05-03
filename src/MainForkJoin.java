@@ -8,7 +8,7 @@ public class MainForkJoin {
     static int ni = 6;
 
     public static void main(String[] args) throws InterruptedException {
-        new ForkJoinSourceAnalyser().getReportpublic(d, n, maxl, ni);
+        //new ForkJoinSourceAnalyser().getReportpublic(d, n, maxl, ni);
         new View(new ForkJoinSourceAnalyser());
     }
 }
