@@ -6,8 +6,6 @@ L’assignment consiste nell'affrontare il problema illustrato nel primo assignm
 
 1) Approccio asincrono a Task – Framework Executors
 2) Approccio basato Virtual Threads
-3) Approccio asincrono ad eventi (event-loop) – Framework Vert.x o equivalenti   	
-4) Approccio basato su programmazione reattiva – Framework RxJava o equivalenti
 
 Per ogni approccio, si richiede che la soluzione sia organizzata in modo da incapsulare la funzionalità di analisi dei sorgenti in una libreria,  che implementi un'interfaccia SourceAnalyser includa due metodi asincroni (in pseudocodice):
 * getReport(Directory d)
