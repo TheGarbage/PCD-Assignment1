@@ -2,7 +2,6 @@ package Assignment2.Common.Monitors.RankingListMonitor;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class RankingListMonitor implements RankingMonitor {

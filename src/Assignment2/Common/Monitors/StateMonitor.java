@@ -1,11 +1,8 @@
 package Assignment2.Common.Monitors;
 
 import Assignment2.Common.Utilities.StateEnum;
-
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
-
-import static Assignment2.Common.Utilities.StateEnum.STOP;
 
 public class StateMonitor {
     private StateEnum stateEnum = StateEnum.WAIT;
@@ -15,7 +12,7 @@ public class StateMonitor {
     public void changeState(StateEnum stateEnum){
         try {
             lock.lock();
-            if(this.stateEnum != STOP && this.stateEnum != stateEnum)
+            if(this.stateEnum != StateEnum.STOP && this.stateEnum != stateEnum)
                 this.stateEnum = stateEnum;
             waitCodition.signal();
         } finally {

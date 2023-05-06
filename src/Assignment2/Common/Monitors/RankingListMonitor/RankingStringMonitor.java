@@ -1,9 +1,7 @@
 package Assignment2.Common.Monitors.RankingListMonitor;
 
-import Assignment1.Utilities.ThreadConstants;
-
+import Assignment2.Common.Utilities.ThreadConstants;
 import java.util.ArrayList;
-import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class RankingStringMonitor implements RankingMonitor {

@@ -16,9 +16,8 @@ public abstract class ExecutorSourceAnalyser implements SourceAnalyser {
     ExecutorService executor;
     DataMonitor dataMonitor;
 
-    public Thread start(String d, int n, int maxl, int ni){
+    private Thread start(String d, int n, int maxl, int ni){
         executor = getExecutor();
-        dataMonitor = new DataMonitor(d, n, maxl, ni, this::stop);
         return Thread.ofVirtual().start(() -> {
             long startTime = System.currentTimeMillis();
             String finalMessage = "Error";
@@ -45,11 +44,11 @@ public abstract class ExecutorSourceAnalyser implements SourceAnalyser {
         });
     }
 
-    public void stop(){
+    private void stop(){
         executor.shutdownNow();
     }
 
-    public void linesCounter(String path) throws IOException {
+    private void linesCounter(String path) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(path));
         int lines = 0;
         while (reader.readLine() != null) lines++;
@@ -58,7 +57,7 @@ public abstract class ExecutorSourceAnalyser implements SourceAnalyser {
         dataMonitor.addFile(item, lines);
     }
 
-    public void directoryReader(String path){
+    private void directoryReader(String path){
         try{
             File file = new File(path);
             ArrayList<Future> futures = new ArrayList<>();
@@ -82,6 +81,7 @@ public abstract class ExecutorSourceAnalyser implements SourceAnalyser {
 
     @Override
     public void getReportpublic(String d, int n, int maxl, int ni) throws InterruptedException {
+        dataMonitor = new DataMonitor(d, n, maxl, ni, this::stop);
         start(d, n, maxl, ni).join();
         System.out.println("Ranking: \n" + dataMonitor.makeStringList());
         System.out.println("Intervals: \n" + dataMonitor.makeStringCounters());
@@ -90,6 +90,7 @@ public abstract class ExecutorSourceAnalyser implements SourceAnalyser {
 
     @Override
     public DataWrapper analyzeSources(String d, int n, int maxl, int ni) {
+        dataMonitor = new DataMonitor(d, n, maxl, ni, this::stop);
         start(d, n, maxl, ni);
         return dataMonitor;
     }

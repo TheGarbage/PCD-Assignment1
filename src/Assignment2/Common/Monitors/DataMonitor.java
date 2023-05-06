@@ -87,9 +87,9 @@ public class DataMonitor implements DataWrapper {
             item = list.get(i);
             text = text.concat((n - i) + ")" +
                     " " +
-                    item.subSequence(58 - (int) item.charAt(ThreadConstants.MAX_DIGITS), ThreadConstants.MAX_DIGITS) +
+                    item.substring(58 - (int) item.charAt(ThreadConstants.MAX_DIGITS), ThreadConstants.MAX_DIGITS) +
                     " - " +
-                    item.subSequence(ThreadConstants.MAX_DIGITS + 1, item.length()) +
+                    item.substring(ThreadConstants.MAX_DIGITS + 1) +
                     "\n");
         }
         return text;
