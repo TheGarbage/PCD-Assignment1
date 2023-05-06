@@ -16,7 +16,7 @@ public abstract class ExecutorSourceAnalyser implements SourceAnalyser {
     ExecutorService executor;
     DataMonitor dataMonitor;
 
-    private Thread start(String d, int n, int maxl, int ni){
+    private Thread start(){
         executor = getExecutor();
         return Thread.ofVirtual().start(() -> {
             long startTime = System.currentTimeMillis();
@@ -82,7 +82,7 @@ public abstract class ExecutorSourceAnalyser implements SourceAnalyser {
     @Override
     public void getReportpublic(String d, int n, int maxl, int ni) throws InterruptedException {
         dataMonitor = new DataMonitor(d, n, maxl, ni, this::stop);
-        start(d, n, maxl, ni).join();
+        start().join();
         System.out.println("Ranking: \n" + dataMonitor.makeStringList());
         System.out.println("Intervals: \n" + dataMonitor.makeStringCounters());
         System.out.println("Total Time: \n" + dataMonitor.getFinalMessage());
@@ -91,7 +91,7 @@ public abstract class ExecutorSourceAnalyser implements SourceAnalyser {
     @Override
     public DataWrapper analyzeSources(String d, int n, int maxl, int ni) {
         dataMonitor = new DataMonitor(d, n, maxl, ni, this::stop);
-        start(d, n, maxl, ni);
+        start();
         return dataMonitor;
     }
 
