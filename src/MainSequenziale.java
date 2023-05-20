@@ -7,7 +7,7 @@ import java.util.Collections;
 
 public class MainSequenziale {
 
-    static String d = "/home/thegarbage/Scaricati/UltimateDirectory";
+    static String d = "C:\\Users\\gugli\\Downloads\\TestFolder\\TestFolder2";
     static int ni = 6;
     static int n = 10;
     static int maxl = 100;
