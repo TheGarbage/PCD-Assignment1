@@ -8,7 +8,7 @@ public class MainVirtualThread {
     static int ni = 6;
 
     public static void main(String[] args) throws InterruptedException {
-        //new VirtualThreadSourceAnalyser().getReportpublic(d, n, maxl, ni);
+        new VirtualThreadSourceAnalyser().getReportpublic(d, n, maxl, ni);
         new View(new VirtualThreadSourceAnalyser());
     }
 }
