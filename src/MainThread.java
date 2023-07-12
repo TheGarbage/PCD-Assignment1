@@ -1,4 +1,4 @@
-import Assignment1.Threads.ThreadMaster;
+import Threads.ThreadMaster;
 
 public class MainThread {
 
